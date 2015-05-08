@@ -679,7 +679,7 @@ Connect to an IPv4 UDP server.
 
 SOCKET* pSock : (INOUT) Valid pointer to a socket that will be used to communicate with the server.
 char* address : (IN) IPv4 address of the server.
-char* port : (IN) TCP port of the server.
+char* port : (IN) UDP port of the server.
 
 Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
 */
