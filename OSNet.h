@@ -2245,6 +2245,64 @@ inline int recvuntil(SOCKET sock, char* recvbuf, char endchar, int maxrecvbuflen
 
 	PRINT_DEBUG_MESSAGE_OSNET(("Total bytes received : %d\n", BytesReceived));
 
+	//*pBytesReceived = BytesReceived;
+
+	return EXIT_SUCCESS;
+}
+
+inline int recvuntilstr(SOCKET sock, char* recvbuf, char* endstr, int maxrecvbuflen, int* pBytesReceived)
+{
+	int BytesReceived = 0;
+	int Bytes = 0;
+
+	// Receive byte per byte.
+	while ((BytesReceived <= 0)||(strstr(recvbuf, endstr) == NULL))
+	{
+		if (BytesReceived >= maxrecvbuflen)
+		{
+			PRINT_DEBUG_ERROR_OSNET(("recvuntilstr error (%s) : %s(sock=%d, recvbuf=%#x, endstr=%s, maxrecvbuflen=%d)\n", 
+				strtime_m(), 
+				"recvbuf full. ", 
+				(int)sock, recvbuf, endstr, maxrecvbuflen));
+			PRINT_DEBUG_MESSAGE_OSNET(("Total bytes received : %d\n", BytesReceived));
+			return EXIT_FAILURE;
+		}
+
+		// Receive 1 byte.
+		Bytes = recv(sock, recvbuf + BytesReceived, 1, 0);
+		if (Bytes >= 0)
+		{
+			if (Bytes == 0)
+			{
+				PRINT_DEBUG_WARNING_OSNET(("recvuntilstr warning (%s) : %s(sock=%d, recvbuf=%#x, endstr=%s, maxrecvbuflen=%d)\n", 
+					strtime_m(), 
+					szOSUtilsErrMsgs[EXIT_TIMEOUT], 
+					(int)sock, recvbuf, endstr, maxrecvbuflen));
+				PRINT_DEBUG_MESSAGE_OSNET(("Total bytes received : %d\n", BytesReceived));
+				return EXIT_TIMEOUT;
+			}
+			else
+			{
+				PRINT_DEBUG_MESSAGE_OSNET(("Bytes received : %d\n", Bytes));
+			}
+		}
+		else
+		{
+			PRINT_DEBUG_ERROR_OSNET(("recvuntilstr error (%s) : %s(sock=%d, recvbuf=%#x, endstr=%s, maxrecvbuflen=%d)\n", 
+				strtime_m(), 
+				"recv failed. ", 
+				(int)sock, recvbuf, endstr, maxrecvbuflen));
+			PRINT_DEBUG_MESSAGE_OSNET(("Total bytes received : %d\n", BytesReceived));
+			return EXIT_FAILURE;
+		}
+
+		BytesReceived += Bytes;
+	}
+
+	PRINT_DEBUG_MESSAGE_OSNET(("Total bytes received : %d\n", BytesReceived));
+
+	*pBytesReceived = BytesReceived;
+
 	return EXIT_SUCCESS;
 }
 
