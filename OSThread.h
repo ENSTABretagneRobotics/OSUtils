@@ -232,6 +232,7 @@ inline int CreateDefaultThread(PTHREAD_PROC pThreadProc, void* pParam, THREAD_ID
 	// Set the thread as joinable. This is the default on Linux. 
 	//pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
+#ifndef __ANDROID__
 	// Indicate whether the scheduling policy and scheduling parameters for the 
 	// newly created thread are determined by the values of the schedpolicy and 
 	// schedparam attributes (value PTHREAD_EXPLICIT_SCHED) or are inherited from 
@@ -246,6 +247,7 @@ inline int CreateDefaultThread(PTHREAD_PROC pThreadProc, void* pParam, THREAD_ID
 		pthread_attr_destroy(&attr);
 		return EXIT_FAILURE;
 	}
+#endif // __ANDROID__
 
 	// Only PTHREAD_SCOPE_SYSTEM is supported on Linux. This is the default on Linux. 
 	// That is a pity as PTHREAD_SCOPE_PROCESS seems to describe a behaviour similar 
@@ -331,7 +333,9 @@ inline int CreateDefaultThread(PTHREAD_PROC pThreadProc, void* pParam, THREAD_ID
 			"pthread_attr_destroy failed. ", 
 			pThreadProc, pParam));
 		pthread_detach(*pThreadId);
+#ifndef __ANDROID__
 		pthread_cancel(*pThreadId);
+#endif // __ANDROID__
 		return EXIT_FAILURE;
 	}
 #endif // _WIN32
