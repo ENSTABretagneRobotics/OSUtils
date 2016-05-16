@@ -1117,6 +1117,7 @@ EXTERN_C char GetUserInput(void);
 
 /*
 Wait for the user to press any key.
+See also getch() or kbhit() functions (conio.h).
 
 Return : Nothing.
 */
