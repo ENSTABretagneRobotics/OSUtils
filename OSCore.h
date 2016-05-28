@@ -35,7 +35,7 @@ _ Borland C++ Builder : __BORLANDC__
 
 _ GCC : __GNUC__
 
-Predifined macros depending on the target operating system : 
+Predefined macros depending on the target operating system : 
 
 _ 32 bit Windows : _WIN32 & !_WIN64
 
