@@ -491,8 +491,6 @@ EXTERN_C char* FormatLastErrorMsg(char* buf, int buflen);
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #pragma GCC diagnostic push
-#else
-//#pragma GCC diagnostic ignored "-Wpragmas"
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
 
@@ -517,7 +515,6 @@ EXTERN_C char* FormatLastErrorMsg(char* buf, int buflen);
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #pragma GCC diagnostic pop
 #else
-//#pragma GCC diagnostic warning "-Wpragmas"
 #pragma GCC diagnostic warning "-Wunused-but-set-variable"
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
