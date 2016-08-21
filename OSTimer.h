@@ -299,7 +299,7 @@ TIMER* pTimer : (INOUT) Valid pointer to a structure corresponding to
 a timer.
 BOOL bReturnImmediately : (IN) If TRUE, mark the timer for deletion and return immediately.
 If FALSE, wait for the timer callback function to complete before returning. 
-ONLY FALSE IS CURRENTLY IMPLEMENTED FOR LINUX, the behaviour is unspecified if there are 
+ONLY FALSE IS CURRENTLY IMPLEMENTED FOR LINUX, the behavior is unspecified if there are 
 outstanding callback functions when this function is called. The parameter is IGNORED FOR
 WINCE.
 

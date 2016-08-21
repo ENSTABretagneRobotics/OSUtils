@@ -1148,7 +1148,7 @@ inline int waitforclifortcpsrv(SOCKET socksrv, SOCKET* pSockCli, int timeout)
 
 	if (iResult == 0)
 	{ 
-		PRINT_DEBUG_WARNING_OSNET(("waitforclifortcpsrv warning (%s) : %s(socksrv=%d, timeout=%d)\n", 
+		PRINT_DEBUG_MESSAGE_OSNET(("waitforclifortcpsrv message (%s) : %s(socksrv=%d, timeout=%d)\n", 
 			strtime_m(), 
 			"select timed out. ", 
 			(int)socksrv, timeout));
