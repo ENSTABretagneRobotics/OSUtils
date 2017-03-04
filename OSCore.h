@@ -240,14 +240,15 @@ _ Windows CE : WINCE
 #endif // inline
 #endif // __cplusplus
 
-#if !defined(NOMINMAX) || defined(FORCE_MINMAX_DEFINITION)
-#ifndef max
-#define max(a,b) (((a) > (b)) ? (a) : (b))
-#endif // max
-#ifndef min
-#define min(a,b) (((a) < (b)) ? (a) : (b))
-#endif // min
-#endif // !defined(NOMINMAX) || defined(FORCE_MINMAX_DEFINITION)
+// Too many incompatibilities on Linux...
+//#if !defined(NOMINMAX)
+//#ifndef max
+//#define max(a,b) (((a) > (b)) ? (a) : (b))
+//#endif // max
+//#ifndef min
+//#define min(a,b) (((a) < (b)) ? (a) : (b))
+//#endif // min
+//#endif // !defined(NOMINMAX)
 
 #ifndef _WIN32
 typedef char CHAR;
