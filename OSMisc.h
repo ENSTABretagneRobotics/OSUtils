@@ -724,9 +724,94 @@ inline void RemovePathInFilePath(char* szFilePath)
 	if ((bFound)&&(idx >= 0)&&(idx < (int)strlen(szFilePath)-1)) memmove(szFilePath, szFilePath+idx+1, strlen(szFilePath)-idx);
 }
 
+inline void GetFileNameAndFilePathAndChangeExtension(char* szFileInPath, char* szNewExtension, char* szFileOutPath, char* szFileOutName)
+{
+	strcpy(szFileOutPath, szFileInPath);
+	RemoveExtensionInFilePath(szFileOutPath);
+	strcpy(szFileOutName, szFileOutPath);
+	strcat(szFileOutPath, szNewExtension);
+	RemovePathInFilePath(szFileOutName);
+}
+
 inline double sensor_err(double bias_err, double max_rand_err)
 {
 	return bias_err+max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+}
+
+// Remember to reset *pipsi to 0 if this control has been disabled during some time...
+inline double PID_angle_control(double psi_bar, double psi_bar_prev, double psi, double omegaz, double* pipsi, 
+	double Kp, double Kd, double Ki, double up_max, double ud_max, double ui_max, 
+	double u_min, double u_max, double psi_error_min, double psi_error_max, double omegaz_max, double dt)
+{
+	double u = 0;
+	double error = fmod_2PI(psi_bar-psi);
+	double derivative = -omegaz;
+	double integral = *pipsi;
+	if (psi_bar != psi_bar_prev) integral = 0;
+	if (error > psi_error_max) 
+	{ 
+		u = u_max; 
+		integral = 0;
+	}
+	else if (error < psi_error_min) 
+	{
+		u = u_min;
+		integral = 0;
+	}
+	else 
+	{
+		if (fabs(Kp*error/M_PI) > up_max) u += sign(Kp*error/M_PI, 0)*up_max; else u += Kp*error/M_PI; // /M_PI to try to normalize...
+		if (fabs(Kd*derivative/omegaz_max) > ud_max) u += sign(Kd*derivative/omegaz_max, 0)*ud_max; else u += Kd*derivative/omegaz_max; // /omegaz_max to try to normalize...
+		if (fabs(Ki*integral/M_PI) > ui_max) u += sign(Ki*integral/M_PI, 0)*ui_max; else u += Ki*integral/M_PI; // /M_PI to try to normalize...
+		integral = integral+error*dt;
+	}
+	*pipsi = integral;
+	return u;
+}
+
+// Remember to reset *piz to 0 if this control has been disabled during some time...
+inline double PID_control(double z_bar, double z_bar_prev, double z, double dz, double* piz, 
+	double Kp, double Kd, double Ki, double up_max, double ud_max, double ui_max, 
+	double u_min, double u_max, double z_error_min, double z_error_max, double dz_max, double dt)
+{
+	double u = 0;
+	double error = z_bar-z;
+	double derivative = -dz;
+	double integral = *piz;
+	if (z_bar != z_bar_prev) integral = 0;
+	if (error > z_error_max) 
+	{ 
+		u = u_max; 
+		integral = 0;
+	}
+	else if (error < z_error_min) 
+	{
+		u = u_min;
+		integral = 0;
+	}
+	else 
+	{
+		if (fabs(Kp*error) > up_max) u += sign(Kp*error, 0)*up_max; else u += Kp*error;
+		if (fabs(Kd*derivative/dz_max) > ud_max) u += sign(Kd*derivative/dz_max, 0)*ud_max; else u += Kd*derivative/dz_max; // /dz_max to try to normalize...
+		if (fabs(Ki*integral) > ui_max) u += sign(Ki*integral, 0)*ui_max; else u += Ki*integral;
+		integral = integral+error*dt;
+	}
+	*piz = integral;
+	return u;
+}
+
+// Return theta_star (see http://www.ensta-bretagne.fr/jaulin/paper_jaulin_irsc12.pdf).
+// Remember to reset *pie to 0 if this control has been disabled during some time...
+inline double LineFollowing_integral(double phi, double phi_prev, double e, double* pie, double gamma_infinite, double r, double Ki, double integral_max, double dt)
+{
+	double psi_star = 0;
+	double integral = *pie;
+	if (phi != phi_prev) integral = 0;
+	if (fabs(Ki*integral) > integral_max) psi_star = phi-(2.0*gamma_infinite/M_PI)*atan2((e+sign(Ki*integral, 0)*integral_max),r);
+	else psi_star = phi-(2.0*gamma_infinite/M_PI)*atan2((e+Ki*integral),r); 
+	integral = integral+e*dt;
+	*pie = integral;
+	return psi_star;
 }
 
 // Return theta_star (see http://www.ensta-bretagne.fr/jaulin/paper_jaulin_irsc12.pdf).
