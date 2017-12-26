@@ -231,7 +231,7 @@ inline int OpenComputerRS232Port(HANDLE* phDev, char* szDevice)
 	// in C because the '\' is a special character).
 	memset(szDeviceTemp, 0, sizeof(szDeviceTemp));
 #ifdef WINCE
-	sprintf(szDeviceTemp, "%s", szDevice);
+	strcpy(szDeviceTemp, szDevice);
 #else
 	sprintf(szDeviceTemp, "\\\\.\\%s", szDevice);
 #endif // WINCE

@@ -110,7 +110,7 @@ __inline int gettimeofday(struct timeval* tv, struct timezone* tz)
 	}
 #endif // USE__TZSET
 
-	return EXIT_SUCCESS;
+	return 0;
 }
 
 //__inline int gettimeofday(struct timeval* tp, void* tz)

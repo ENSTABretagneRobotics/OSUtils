@@ -1,1 +1,1 @@
-C:\Progs2K3\Borland\CBuilder5\Include
+C:\Program Files\Borland\CBuilder5\Include
