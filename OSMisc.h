@@ -406,6 +406,79 @@ inline double varn(double* tab_values, double* tab_numbers, int tab_length)
 	return v;
 }
 
+// https://en.wikiversity.org/wiki/C_Source_Code/Find_the_median_and_mean
+// https://www.tutorialspoint.com/learn_c_by_examples/median_program_in_c.htm
+inline double median(double* tab_values, int tab_length)
+{
+	double temp = 0;
+	int i = 0, j = 0;
+	int n = tab_length;
+	double* x = tab_values;
+
+	// The following two loops sort the array x in ascending order.
+	for (i = 0; i < n-1; i++) {
+		for (j = i+1; j < n; j++) {
+			if (x[j] < x[i]) {
+				// Swap elements.
+				temp = x[i];
+				x[i] = x[j];
+				x[j] = temp;
+			}
+		}
+	}
+
+	return x[n/2];
+}
+
+// https://en.wikiversity.org/wiki/C_Source_Code/Find_the_median_and_mean
+// https://www.tutorialspoint.com/learn_c_by_examples/median_program_in_c.htm
+inline double median2(double* tab_values, int tab_length)
+{
+	double temp = 0;
+	int i = 0, j = 0;
+	int n = tab_length;
+	double* x = tab_values;
+
+	// The following two loops sort the array x in ascending order.
+	for (i = 0; i < n-1; i++) {
+		for (j = i+1; j < n; j++) {
+			if (x[j] < x[i]) {
+				// Swap elements.
+				temp = x[i];
+				x[i] = x[j];
+				x[j] = temp;
+			}
+		}
+	}
+
+	if (n%2 == 0)
+	{
+		// For an even number of elements, return the mean of the two elements in the middle.
+		return ((x[n/2]+x[n/2-1])/2.0);
+	}
+	else
+	{
+		// Return the element in the middle.
+		return x[n/2];
+	}
+}
+
+// https://fr.wikipedia.org/wiki/Moyenne_mobile
+// https://en.wikipedia.org/wiki/Moving_average
+// http://www.cafemath.fr/mathblog/article.php?page=MovingAverages.php
+inline double rect_mv_avg(double newvalue, double oldestvalue, double prevaverage, int n)
+{
+	return prevaverage+(newvalue-oldestvalue)/(double)n;
+}
+
+// https://fr.wikipedia.org/wiki/Moyenne_mobile
+// https://en.wikipedia.org/wiki/Moving_average
+// http://www.cafemath.fr/mathblog/article.php?page=MovingAverages.php
+inline double exp_mv_avg(double newvalue, double prevaverage, double alpha)
+{
+	return alpha*prevaverage+(1.0-alpha)*newvalue;
+}
+
 #ifndef FGETS2_DEFINED
 #define FGETS2_DEFINED
 /*
