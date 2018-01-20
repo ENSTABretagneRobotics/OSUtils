@@ -483,7 +483,7 @@ inline double exp_mv_avg(double newvalue, double prevaverage, double alpha)
 #define FGETS2_DEFINED
 /*
 Return a line of a file using fgets(), skipping lines that begin with a '%'. 
-Return NULL when a line begin with a '$' or when fgets() return NULL.
+Return NULL when a line begins with a '$' or when fgets() returns NULL.
 
 FILE* file : (IN) Pointer to a file.
 char* line : (IN) Storage location for data.
@@ -514,7 +514,7 @@ inline char* fgets2(FILE* file, char* line, int nbChar)
 Return a line of a file using fgets(), skipping lines that begin with a '%' 
 (Scilab-style comments), a '#' (Linux configuration files-style comments) or 
 "//" (C-style comments). 
-Return NULL when a line begin with a '$' or when fgets() return NULL, or if 
+Return NULL when a line begins with a '$' or when fgets() returns NULL, or if 
 the maximum number of characters to read is less than 2.
 
 FILE* file : (IN) Pointer to a file.
@@ -544,6 +544,56 @@ inline char* fgets3(FILE* file, char* line, int nbChar)
 
 	if (line[0] == '$')
 	{
+		r = NULL;
+	}
+
+	return r;
+}
+
+/*
+Return a line from an input file using fgets(), skipping lines that begin with a '%' 
+(Scilab-style comments), a '#' (Linux configuration files-style comments) or 
+"//" (C-style comments). 
+Return NULL when a line begins with a '$' or when fgets() returns NULL, or if 
+the maximum number of characters to read is less than 2.
+All the skipped lines are saved to the output file.
+
+FILE* filein : (IN) Pointer to an input file.
+FILE* fileout : (IN) Pointer to an output file.
+char* line : (IN) Storage location for data.
+int nbChar : (IN) Maximum number of characters to read.
+
+Return : The line or NULL.
+*/
+inline char* fgetscopy3(FILE* filein, FILE* fileout, char* line, int nbChar)
+{
+	char* r = NULL;
+
+	if (nbChar < 2)
+	{
+		return NULL;
+	}
+
+	for (;;)
+	{
+		r = fgets(line, nbChar, filein);
+		if ((
+			(line[0] == '%')||
+			(line[0] == '#')||
+			((line[0] == '/')&&(line[1] == '/'))
+			) && (r != NULL))
+		{
+			if (fprintf(fileout, "%s", line) < 0) return NULL;
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	if (line[0] == '$')
+	{
+		if (r != NULL) fprintf(fileout, "%s", line);
 		r = NULL;
 	}
 
