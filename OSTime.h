@@ -69,7 +69,7 @@ Debug macros specific to OSTime.
 #endif // ENABLE_GETTIMEOFDAY_WIN32
 #else
 #include <sys/time.h>
-#endif // ENABLE_SYS_TIME_H_WIN32
+#endif // !ENABLE_SYS_TIME_H_WIN32
 #else 
 // CLOCK_MONOTONIC is a clock that cannot be set and represents monotonic time since 
 // some unspecified starting point.
@@ -77,7 +77,7 @@ Debug macros specific to OSTime.
 // hardware-based time that is not subject to NTP adjustments.
 #ifndef CLOCK_MONOTONIC_RAW 
 #define CLOCK_MONOTONIC_RAW CLOCK_MONOTONIC
-#endif // CLOCK_MONOTONIC_RAW 
+#endif // !CLOCK_MONOTONIC_RAW 
 #endif // _WIN32
 
 EXTERN_C char strftime_m_tmpbuf[64]; // Used to store the string returned by strtime_m().
@@ -136,7 +136,7 @@ struct CHRONO
 };
 typedef struct CHRONO CHRONO;
 #endif // defined(ENABLE_GETTIMEOFDAY_WIN32) || defined(ENABLE_SYS_TIME_H_WIN32)
-#endif // USE_OLD_CHRONO
+#endif // !USE_OLD_CHRONO
 
 #ifdef _WIN32
 #ifndef ENABLE_SYS_TIME_H_WIN32
@@ -271,7 +271,7 @@ inline int gettimeofday(struct timeval* tv, struct timezone* tz)
 //	TVal->tv_usec = (unsigned int)(Ticks % 10000000) / 10;
 //}
 #endif // ENABLE_GETTIMEOFDAY_WIN32
-#endif // ENABLE_SYS_TIME_H_WIN32
+#endif // !ENABLE_SYS_TIME_H_WIN32
 #endif // _WIN32
 
 #ifndef _WIN32
@@ -290,7 +290,7 @@ inline DWORD GetTickCount(void)
 
 	return (DWORD)((tv.tv_sec*1000)+(tv.tv_usec/1000));
 }
-#endif // _WIN32
+#endif // !_WIN32
 
 // DWORD timeGetTime(void) is also similar to GetTickCount()...
 
@@ -300,21 +300,21 @@ inline DWORD GetTickCount(void)
 #ifndef WINCE
 #ifndef timegm
 #define timegm _mkgmtime
-#endif // timegm
+#endif // !timegm
 // timelocal() is a deprecated interface that is equivalent to calling mktime() with a negative value for tm_isdst...
 #ifndef timelocal
 #define timelocal mktime
-#endif // timelocal
-#endif // WINCE
+#endif // !timelocal
+#endif // !WINCE
 
 #else
 
 #ifndef _mkgmtime
 #define _mkgmtime timegm
-#endif // _mkgmtime
+#endif // !_mkgmtime
 
 #endif // _WIN32
-#endif // DISABLE_TIMEGM_MKGMTIME
+#endif // !DISABLE_TIMEGM_MKGMTIME
 
 /*
 Return a string like ctime() but in this format :
@@ -1615,6 +1615,6 @@ inline double StopChronoQuick(CHRONO* pChrono)
 	}
 }
 #endif // defined(ENABLE_GETTIMEOFDAY_WIN32) || defined(ENABLE_SYS_TIME_H_WIN32)
-#endif // USE_OLD_CHRONO
+#endif // !USE_OLD_CHRONO
 
-#endif // OSTIME_H
+#endif // !OSTIME_H

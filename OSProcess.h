@@ -85,11 +85,11 @@ inline PROCESS_IDENTIFIER GetCurrentProcessId(void)
 {
 	return getpid();
 }
-#endif // _WIN32
+#endif // !_WIN32
 
 //#ifndef _WIN32
 //EXTERN_C void _ChildEndHandler(int sig);
-//#endif // _WIN32
+//#endif // !_WIN32
 
 /*
 Create a process with default attributes.
@@ -200,7 +200,7 @@ inline int CreateDefaultProcess(char* szCommandLine, PROCESS_IDENTIFIER* pProces
 			szCommandLine));
 		return EXIT_FAILURE;
 	}
-#endif // WINCE
+#endif // !WINCE
 
 	*pProcessId = pi.dwProcessId;
 
@@ -573,7 +573,7 @@ inline void ProcessYield(void)
 	SleepEx(0,0);
 #else
 	Sleep(0);
-#endif // WINCE
+#endif // !WINCE
 #else 
 	sched_yield();
 #endif // _WIN32
@@ -728,4 +728,4 @@ inline BOOL CompareProcessId(PROCESS_IDENTIFIER ProcessId1, PROCESS_IDENTIFIER P
 
 #endif // TEST
 
-#endif // OSPROCESS_H
+#endif // !OSPROCESS_H

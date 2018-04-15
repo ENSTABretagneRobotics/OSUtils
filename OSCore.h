@@ -72,10 +72,10 @@ _ Windows CE : WINCE
 #if defined(UNICODE) || defined(_UNICODE)
 #ifndef UNICODE
 #define UNICODE
-#endif // UNICODE
+#endif // !UNICODE
 #ifndef _UNICODE
 #define _UNICODE
-#endif // _UNICODE
+#endif // !_UNICODE
 #endif // defined(UNICODE) || defined(_UNICODE)
 #endif // __GNUC__
 #endif // _WIN32
@@ -177,7 +177,7 @@ _ Windows CE : WINCE
 #ifndef WINCE
 #include <errno.h> // Error Codes Reported by (Some) Library Functions.
 #include <signal.h> // Signals.
-#endif // WINCE
+#endif // !WINCE
 
 #ifdef __GNUC__
 // C99 headers. Some headers are not supported by all the compilers or depends 
@@ -195,7 +195,7 @@ _ Windows CE : WINCE
 
 #ifndef WINCE
 #include <fcntl.h>
-#endif // WINCE
+#endif // !WINCE
 
 #ifdef _WIN32
 #include <tchar.h>
@@ -203,7 +203,7 @@ _ Windows CE : WINCE
 // This must be done if we plan to include Winsock2.h in other files.
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
-#endif // WIN32_LEAN_AND_MEAN
+#endif // !WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #else 
 #include <unistd.h>
@@ -223,7 +223,7 @@ _ Windows CE : WINCE
 #else
 #define EXTERN_C extern 
 #endif // __cplusplus
-#endif // EXTERN_C
+#endif // !EXTERN_C
 
 #ifndef __cplusplus
 #ifndef inline
@@ -237,17 +237,17 @@ _ Windows CE : WINCE
 // extern __inline__ in ws2tcpip.h for GNU?
 #define inline static __inline__
 #endif // __GNUC__
-#endif // inline
-#endif // __cplusplus
+#endif // !inline
+#endif // !__cplusplus
 
 // Too many incompatibilities on Linux...
 //#if !defined(NOMINMAX)
 //#ifndef max
 //#define max(a,b) (((a) > (b)) ? (a) : (b))
-//#endif // max
+//#endif // !max
 //#ifndef min
 //#define min(a,b) (((a) < (b)) ? (a) : (b))
-//#endif // min
+//#endif // !min
 //#endif // !defined(NOMINMAX)
 
 #ifndef _WIN32
@@ -260,7 +260,7 @@ typedef unsigned int UINT;
 typedef long LONG;
 typedef unsigned long ULONG;
 typedef float FLOAT;
-#endif // _WIN32
+#endif // !_WIN32
 typedef double DOUBLE;
 
 #ifdef __GNUC__
@@ -296,24 +296,24 @@ typedef double DOUBLE;
 #ifndef _WIN32
 //#ifndef ZeroMemory
 #define ZeroMemory(Destination,Length) memset((Destination),0,(Length))
-//#endif // ZeroMemory
+//#endif // !ZeroMemory
 typedef void* HANDLE;
 //#ifndef INVALID_HANDLE_VALUE
 #define INVALID_HANDLE_VALUE ((HANDLE)-1)
-//#endif // INVALID_HANDLE_VALUE
+//#endif // !INVALID_HANDLE_VALUE
 typedef int                 BOOL;
 #ifndef FALSE
 #define FALSE               0
-#endif // FALSE
+#endif // !FALSE
 #ifndef TRUE
 #define TRUE                1
-#endif // TRUE
+#endif // !TRUE
 typedef unsigned int u_int;
 typedef unsigned char BYTE;
 typedef unsigned short WORD;
 typedef unsigned int DWORD;
 typedef BYTE BOOLEAN;           
-#endif // _WIN32
+#endif // !_WIN32
 
 // Might depend on the platform...
 typedef unsigned char uint8;
@@ -356,7 +356,7 @@ typedef union _ULARGE_INTEGER {
 	} u;
 	unsigned long long QuadPart;
 } ULARGE_INTEGER;
-#endif // _WIN32
+#endif // !_WIN32
 
 /*
 Structure corresponding to a color in a RGB format (red, green and blue
@@ -584,4 +584,4 @@ Debug macros specific to OSCore.
 #	define PRINT_DEBUG_ERROR_OSCORE(params)
 #endif // _DEBUG_ERRORS_OSCORE
 
-#endif // OSCORE_H
+#endif // !OSCORE_H

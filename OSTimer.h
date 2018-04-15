@@ -64,7 +64,7 @@ Debug macros specific to OSTimer.
 #else 
 #ifndef USE_OLD_TIMER
 #include <sys/timerfd.h>
-#endif // USE_OLD_TIMER
+#endif // !USE_OLD_TIMER
 #endif // _WIN32
 
 #ifdef _WIN32
@@ -92,7 +92,7 @@ struct TIMER
 	TIMERTHREADPARAM TimerThreadParam;
 };
 typedef struct TIMER TIMER;
-#endif // WINCE
+#endif // !WINCE
 #else
 #define MAX_NB_TIMER_CALLBACK_THREADS 500
 
@@ -113,7 +113,7 @@ struct TIMERTHREADPARAM
 	pthread_mutex_t mutex;
 #ifndef USE_OLD_TIMER
 	int timerfd;
-#endif // USE_OLD_TIMER
+#endif // !USE_OLD_TIMER
 };
 typedef struct TIMERTHREADPARAM TIMERTHREADPARAM;
 
@@ -203,11 +203,11 @@ inline int CreateTimer(TIMER* pTimer, TIMERCALLBACK Callback, void* pParam, UINT
 			Callback, pParam, DueTime, Period));
 		return EXIT_FAILURE;
 	}
-#endif // WINCE
+#endif // !WINCE
 #else 
 #ifndef USE_OLD_TIMER
 	struct itimerspec its, old;
-#endif // USE_OLD_TIMER
+#endif // !USE_OLD_TIMER
 
 	pTimer->TimerThreadParam.CallbackFunction = Callback;
 	pTimer->TimerThreadParam.pCallbackParam = pParam;
@@ -280,7 +280,7 @@ inline int CreateTimer(TIMER* pTimer, TIMERCALLBACK Callback, void* pParam, UINT
 			Callback, pParam, DueTime, Period));
 #ifndef USE_OLD_TIMER
 		close(pTimer->TimerThreadParam.timerfd);
-#endif // USE_OLD_TIMER
+#endif // !USE_OLD_TIMER
 		pthread_cond_destroy(&pTimer->TimerThreadParam.cv);
 		pthread_mutex_destroy(&pTimer->TimerThreadParam.mutex);
 		return EXIT_FAILURE;
@@ -342,7 +342,7 @@ inline int DeleteTimer(TIMER* pTimer, BOOL bReturnImmediately)
 			pTimer, (int)bReturnImmediately));
 		return EXIT_FAILURE;
 	}
-#endif // WINCE
+#endif // !WINCE
 #else 
 #ifndef USE_OLD_TIMER
 	//struct itimerspec its, old;
@@ -363,7 +363,7 @@ inline int DeleteTimer(TIMER* pTimer, BOOL bReturnImmediately)
 	//		pTimer, (int)bReturnImmediately));
 	//	return EXIT_FAILURE;
 	//}
-#endif // USE_OLD_TIMER
+#endif // !USE_OLD_TIMER
 
 	pTimer->TimerThreadParam.bIOPending = FALSE;
 
@@ -407,7 +407,7 @@ inline int DeleteTimer(TIMER* pTimer, BOOL bReturnImmediately)
 				pTimer, (int)bReturnImmediately));
 			return EXIT_FAILURE;
 		}
-#endif // USE_OLD_TIMER
+#endif // !USE_OLD_TIMER
 
 		if (pthread_mutex_lock(&pTimer->TimerThreadParam.mutex) != EXIT_SUCCESS)
 		{
@@ -500,7 +500,7 @@ inline int DeleteTimer(TIMER* pTimer, BOOL bReturnImmediately)
 				pTimer, (int)bReturnImmediately));
 			return EXIT_FAILURE;
 		}
-#endif // USE_OLD_TIMER
+#endif // !USE_OLD_TIMER
 
 		if (pthread_mutex_lock(&pTimer->TimerThreadParam.mutex) != EXIT_SUCCESS)
 		{
@@ -565,4 +565,4 @@ inline int DeleteTimer(TIMER* pTimer, BOOL bReturnImmediately)
 	return EXIT_SUCCESS;
 }
 
-#endif // OSTIMER_H
+#endif // !OSTIMER_H

@@ -29,7 +29,7 @@ int ABOVE_NORMAL_PRIORITY_CLASS = 60;
 int NORMAL_PRIORITY_CLASS = 50;
 int BELOW_NORMAL_PRIORITY_CLASS = 40;
 int IDLE_PRIORITY_CLASS = 0;
-#endif // _WIN32
+#endif // !_WIN32
 */
 
 //#ifndef _WIN32
@@ -38,4 +38,4 @@ int IDLE_PRIORITY_CLASS = 0;
 //  wait(NULL);
 //  return;
 //}
-//#endif // _WIN32
+//#endif // !_WIN32

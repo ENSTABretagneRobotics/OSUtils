@@ -309,4 +309,4 @@ inline int FD_REMOVE(SOCKET_DATA* sd, fd_list* sock_list, fd_set* sock_set)
 #pragma warning(default : 4127) 
 #endif // _MSC_VER
 
-#endif // OSFDLIST_H
+#endif // !OSFDLIST_H

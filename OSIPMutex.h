@@ -665,4 +665,4 @@ inline int WaitAndGetIPMutex(IPMUTEX* pMutex, int timeout)
 	return EXIT_SUCCESS;
 }
 
-#endif // OSIPMUTEX_H
+#endif // !OSIPMUTEX_H

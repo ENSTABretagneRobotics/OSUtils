@@ -492,4 +492,4 @@ inline int WaitForEvent(EVENT* pEvent, int timeout)
 	return EXIT_SUCCESS;
 }
 
-#endif // OSEV_H
+#endif // !OSEV_H

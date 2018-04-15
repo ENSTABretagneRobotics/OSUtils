@@ -330,4 +330,4 @@ inline int WaitAndGetSemaphore(SEMAPHORE* pSemaphore, int timeout)
 	return EXIT_SUCCESS;
 }
 
-#endif // OSSEM_H
+#endif // !OSSEM_H

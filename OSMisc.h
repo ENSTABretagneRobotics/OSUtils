@@ -32,8 +32,8 @@ Created : 2009-01-28
 #ifndef DISABLE_USER_INPUT_FUNCTIONS
 #ifndef DISABLE_USER_INPUT_TIMEOUT_FUNCTIONS
 #include "OSTime.h"
-#endif // DISABLE_USER_INPUT_TIMEOUT_FUNCTIONS
-#endif // DISABLE_USER_INPUT_FUNCTIONS
+#endif // !DISABLE_USER_INPUT_TIMEOUT_FUNCTIONS
+#endif // !DISABLE_USER_INPUT_FUNCTIONS
 
 /*
 Debug macros specific to OSMisc.
@@ -73,7 +73,7 @@ Debug macros specific to OSMisc.
 #else 
 #include <termios.h>
 #endif // _WIN32
-#endif // DISABLE_USER_INPUT_FUNCTIONS
+#endif // !DISABLE_USER_INPUT_FUNCTIONS
 
 //// To check...
 //#ifdef __GNUC__
@@ -89,12 +89,12 @@ Debug macros specific to OSMisc.
 #if !defined(NOMINMAX)
 #ifndef max
 #define max(a,b) (((a) > (b)) ? (a) : (b))
-#endif // max
+#endif // !max
 #ifndef min
 #define min(a,b) (((a) < (b)) ? (a) : (b))
-#endif // min
+#endif // !min
 #endif // !defined(NOMINMAX)
-#endif // _WIN32
+#endif // !_WIN32
 
 #define MAX_BUF_LEN 256
 
@@ -127,12 +127,12 @@ inline double sqr(double x)
 {
 	return x*x;
 }
-#endif // sqr
-#endif // SQR_DEFINED
+#endif // !sqr
+#endif // !SQR_DEFINED
 
 #ifndef sq
 #define sq(x) ((x)*(x))
-#endif // sq
+#endif // !sq
 
 #ifndef SIGN_DEFINED
 #define SIGN_DEFINED
@@ -157,12 +157,12 @@ inline double sign(double x, double epsilon)
 	else 
 		return x/epsilon;
 }
-#endif // sign
-#endif // SIGN_DEFINED
+#endif // !sign
+#endif // !SIGN_DEFINED
 
 #ifndef constrain
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
-#endif // constrain
+#endif // !constrain
 
 // See https://www.arduino.cc/reference/en/language/functions/math/map/.
 inline double remap2range(double x, double in_min, double in_max, double out_min, double out_max)
@@ -312,8 +312,8 @@ inline double mean(double* tab, int tab_length)
 
 	return m;
 }
-#endif // mean
-#endif // MEAN_DEFINED
+#endif // !mean
+#endif // !MEAN_DEFINED
 
 #ifndef VAR_DEFINED
 #define VAR_DEFINED
@@ -345,8 +345,8 @@ inline double var(double* tab, int tab_length)
 
 	return v;
 }
-#endif // var
-#endif // VAR_DEFINED
+#endif // !var
+#endif // !VAR_DEFINED
 
 /*
 Compute the mean of a table using a table of numbers of occurences for each value.
@@ -508,7 +508,7 @@ inline char* fgets2(FILE* file, char* line, int nbChar)
 
 	return r;
 }
-#endif // FGETS2_DEFINED
+#endif // !FGETS2_DEFINED
 
 /*
 Return a line of a file using fgets(), skipping lines that begin with a '%' 
@@ -845,6 +845,9 @@ inline int fcopy(char* szFromFilePath, char* szToFilePath, size_t* pBytesCopied)
 
 inline void RemoveExtensionInFilePath(char* szFilePath)
 {
+	// WIN32_WINNT 0x0602 : PathCchRemoveExtension 
+	// WIN32 : PathRemoveExtension 
+
 	int idx = 0;
 
 	for (idx = (int)strlen(szFilePath)-1; idx >= 0; idx--) { if (szFilePath[idx] == '.') break; }
@@ -869,6 +872,9 @@ inline void RemovePathInFilePath(char* szFilePath)
 
 inline void GetFileNameAndFilePathAndChangeExtension(char* szFileInPath, char* szNewExtension, char* szFileOutPath, char* szFileOutName)
 {
+	// WIN32_WINNT 0x0602 : PathCchRenameExtension 
+	// WIN32 : PathRenameExtension 
+
 	strcpy(szFileOutPath, szFileInPath);
 	RemoveExtensionInFilePath(szFileOutPath);
 	strcpy(szFileOutName, szFileOutPath);
@@ -1537,7 +1543,7 @@ See also getch() or kbhit() functions (conio.h).
 Return : Nothing.
 */
 EXTERN_C void WaitForUserInput(void);
-#endif // WINCE
+#endif // !WINCE
 
 /*
 Allocate memory for an array of height*width and initialize it to 0.
@@ -1607,6 +1613,6 @@ inline void useless_function(int useless_param)
 #ifdef min
 #undef min
 #endif // min
-#endif // _WIN32
+#endif // !_WIN32
 
-#endif // OSMISC_H
+#endif // !OSMISC_H

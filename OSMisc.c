@@ -302,7 +302,7 @@ char GetUserInputTimeout(UINT timeout)
 	return buf[0];
 #endif // _WIN32
 }
-#endif // DISABLE_USER_INPUT_TIMEOUT_FUNCTIONS
+#endif // !DISABLE_USER_INPUT_TIMEOUT_FUNCTIONS
 
 /*
 Prompt for the user to press any key.
@@ -575,7 +575,7 @@ void WaitForUserInput(void)
 #endif // _WIN32
 #endif //USE_PAUSE_CMD
 }
-#endif // DISABLE_USER_INPUT_FUNCTIONS
+#endif // !DISABLE_USER_INPUT_FUNCTIONS
 
 /*
 Allocate memory for an array of height*width and initialize it to 0.

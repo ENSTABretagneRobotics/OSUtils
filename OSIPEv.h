@@ -754,4 +754,4 @@ inline int WaitForIPEvent(IPEVENT* pEvent, int timeout)
 	return EXIT_SUCCESS;
 }
 
-#endif // OSIPEV_H
+#endif // !OSIPEV_H

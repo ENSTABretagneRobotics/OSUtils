@@ -336,5 +336,5 @@ void* _TimerThreadProc(void* pParam)
 
 	return 0;
 }
-#endif // USE_OLD_TIMER
+#endif // !USE_OLD_TIMER
 #endif // _WIN32

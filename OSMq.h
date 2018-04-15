@@ -272,7 +272,7 @@ inline int DeleteMq(MQ* pMq)
 #else
 	// For WINCE, the thread identifier is the handle of the thread.
 	HANDLE hThread = (HANDLE)*pMq;
-#endif // WINCE
+#endif // !WINCE
 
 	// To stop the loop in the thread associated with the message queue, we
 	// send a special message of type WM_USER+1 with data of 0.
@@ -290,7 +290,7 @@ inline int DeleteMq(MQ* pMq)
 			pMq));
 #ifndef WINCE
 		CloseHandle(hThread);
-#endif // WINCE
+#endif // !WINCE
 		return EXIT_FAILURE;
 	}
 
@@ -307,7 +307,7 @@ inline int DeleteMq(MQ* pMq)
 			pMq));
 #ifndef WINCE
 		CloseHandle(hThread);
-#endif // WINCE
+#endif // !WINCE
 		return EXIT_FAILURE;
 	}
 
@@ -323,7 +323,7 @@ inline int DeleteMq(MQ* pMq)
 			pMq));
 		return EXIT_FAILURE;
 	}
-#endif // WINCE
+#endif // !WINCE
 #else 
 	if (mq_close(pMq->mq) != EXIT_SUCCESS)
 	{
@@ -529,4 +529,4 @@ inline int WaitAndGetMq(MQ* pMq, void** pMsg, int timeout)//PendMq
 	return EXIT_SUCCESS;
 }
 
-#endif // OSMQ_H
+#endif // !OSMQ_H

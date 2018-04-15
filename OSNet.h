@@ -26,7 +26,7 @@ Created : 2007
 #include "OSTime.h"
 #ifndef DISABLE_THREADS_OSNET
 #include "OSThread.h"
-#endif // DISABLE_THREADS_OSNET
+#endif // !DISABLE_THREADS_OSNET
 
 /*
 Debug macros specific to OSNet.
@@ -94,6 +94,9 @@ Debug macros specific to OSNet.
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/select.h>
+#ifndef DISABLE_IOCTLSOCKET
+#include <sys/ioctl.h>
+#endif // !DISABLE_IOCTLSOCKET
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <netdb.h>
@@ -102,7 +105,7 @@ Debug macros specific to OSNet.
 
 #ifndef DEFAULT_SOCK_TIMEOUT
 #define DEFAULT_SOCK_TIMEOUT 10000
-#endif // DEFAULT_SOCK_TIMEOUT
+#endif // !DEFAULT_SOCK_TIMEOUT
 
 #ifdef _WIN32
 /*
@@ -168,6 +171,9 @@ typedef int SOCKET;
 #define SD_SEND SHUT_WR
 #define SD_BOTH SHUT_RDWR
 
+#ifndef DISABLE_IOCTLSOCKET
+#define ioctlsocket ioctl
+#endif // !DISABLE_IOCTLSOCKET
 #define closesocket(sock) close((sock))
 #endif // _WIN32
 
@@ -489,7 +495,7 @@ On return it will contain the actual length in bytes of the address returned. NU
 //int shutdown(SOCKET s);
 
 /*
-Set timeout options for a given socket.
+Set timeout options for a socket.
 
 SOCKET sock : (IN) Socket.
 int timeout : (IN) Timeout in ms for send and recv (0 to disable timeouts).
@@ -1522,12 +1528,43 @@ inline int LaunchMultiCliTCPSrv(char* port, int (*handlecli)(SOCKET, void*), voi
 
 	return EXIT_SUCCESS;
 }
-#endif // DISABLE_THREADS_OSNET
+#endif // !DISABLE_THREADS_OSNET
 #ifdef _MSC_VER
 // Restore the Visual Studio warnings previously disabled.
 #pragma warning(default : 4702) 
 //#pragma warning(default : 4127) 
 #endif // _MSC_VER
+
+#ifndef DISABLE_IOCTLSOCKET
+/*
+Check for any data available to read on a socket.
+
+SOCKET sock : (IN) Socket.
+
+Return : EXIT_SUCCESS if there is data to read from the socket, EXIT_TIMEOUT if a timeout occurs or 
+EXIT_FAILURE if there is an error.
+*/
+inline int checkavailablebytessocket(SOCKET sock)
+{
+//#ifdef _WIN32
+	unsigned long bytes_avail = 0;
+//#else
+//	int bytes_avail = 0;
+//#endif // _WIN32
+
+	if (ioctlsocket(sock, FIONREAD, &bytes_avail) != EXIT_SUCCESS)
+	{
+		PRINT_DEBUG_ERROR_OSNET(("checkavailablebytessocket error (%s) : %s(sock=%d)\n", 
+			strtime_m(), 
+			WSAGetLastErrorMsg(), 
+			(int)sock));
+		return EXIT_FAILURE;
+	}
+	if (bytes_avail <= 0) return EXIT_TIMEOUT;
+
+	return EXIT_SUCCESS;
+}
+#endif // !DISABLE_IOCTLSOCKET
 
 // The 2 following functions should be used with caution...
 
@@ -1536,7 +1573,7 @@ inline int LaunchMultiCliTCPSrv(char* port, int (*handlecli)(SOCKET, void*), voi
 #pragma warning(disable : 4127) 
 #endif // _MSC_VER
 /*
-Wait for data to read on a given socket.
+Wait for data to read on a socket.
 
 SOCKET sock : (IN) Socket.
 timeval timeout : (IN) Max time to wait before returning.
@@ -1578,7 +1615,7 @@ inline int waitforsocket(SOCKET sock, struct timeval timeout)
 }
 
 /*
-Eliminate all the data coming from a given socket (if any).
+Eliminate all the data coming from a socket (if any).
 
 SOCKET sock : (IN) Socket.
 
@@ -1637,7 +1674,7 @@ inline int flushsocket(SOCKET sock)
 #endif // _MSC_VER
 
 /*
-Send data to a given socket. Retry automatically if all the bytes were not sent.
+Send data to a socket. Retry automatically if all the bytes were not sent.
 Fail when a timeout occurs if it is enabled on the socket.
 
 SOCKET sock : (IN) Socket.
@@ -1713,7 +1750,7 @@ inline int sendall(SOCKET sock, char* sendbuf, int sendbuflen)
 }
 
 /*
-Receive data at a given socket. Retry automatically if all the bytes were not received.
+Receive data at a socket. Retry automatically if all the bytes were not received.
 Fail when a timeout occurs if it is enabled on the socket.
 
 SOCKET sock : (IN) Socket.
@@ -2020,7 +2057,7 @@ inline int recvlatest(SOCKET sock, char* recvbuf, int recvbuflen)
 }
 
 /*
-Receive data at a given socket until a specific end string is received.
+Receive data at a socket until a specific end string is received.
 If this string is found (and the maximum number of bytes to receive has not 
 been reached), it is not necessarily the last received bytes in the buffer 
 (other bytes might have been received after).
@@ -2094,7 +2131,7 @@ inline int recvatleastuntilstr(SOCKET sock, char* recvbuf, char* endstr, int max
 }
 
 /*
-Receive data at a given socket until a specific end character is received.
+Receive data at a socket until a specific end character is received.
 If this character is found (and the maximum number of bytes to receive has not 
 been reached), it is not necessarily the last received byte in the buffer 
 (other bytes might have been received after).
@@ -2178,7 +2215,7 @@ inline int recvatleastuntil(SOCKET sock, char* recvbuf, char endchar, int maxrec
 }
 
 /*
-Receive data at a given socket until a specific end character is received.
+Receive data at a socket until a specific end character is received.
 If this character is found (and the maximum number of bytes to receive has not 
 been reached), it is the last received byte in the buffer.
 This function might take more network load than recvatleastuntil() but guarantees
@@ -2305,4 +2342,4 @@ inline int recvuntilstr(SOCKET sock, char* recvbuf, char* endstr, int maxrecvbuf
 	return EXIT_SUCCESS;
 }
 
-#endif // OSNET_H
+#endif // !OSNET_H

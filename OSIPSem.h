@@ -392,4 +392,4 @@ inline int WaitAndGetIPSemaphore(IPSEMAPHORE* pSemaphore, int timeout)
 	return EXIT_SUCCESS;
 }
 
-#endif // OSIPSEM_H
+#endif // !OSIPSEM_H
