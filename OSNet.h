@@ -617,8 +617,8 @@ inline int inittcpcli(SOCKET* pSock, char* address, char* port)
 	// The sockaddr_in structure specifies the address family,
 	// IP address, and port of the server to be connected to.
 	sa.sin_family = AF_INET;
-	sa.sin_addr.s_addr = inet_addr(address);
 	sa.sin_port = htons((unsigned short)atoi(port));
+	sa.sin_addr.s_addr = inet_addr(address);
 
 	// Connect to server.
 	if (connect(*pSock, (struct sockaddr*)&sa, sizeof(sa)) != EXIT_SUCCESS)
@@ -743,8 +743,8 @@ inline int initudpcli(SOCKET* pSock, char* address, char* port)
 	// The sockaddr_in structure specifies the address family,
 	// IP address, and port of the server to be connected to.
 	sa.sin_family = AF_INET;
-	sa.sin_addr.s_addr = inet_addr(address);
 	sa.sin_port = htons((unsigned short)atoi(port));
+	sa.sin_addr.s_addr = inet_addr(address);
 
 //	// Associate the client to the desired address and port.
 //	if (bind(*pSock, (struct sockaddr*)&sa, sizeof(sa)) != EXIT_SUCCESS)
@@ -887,8 +887,8 @@ inline int inittcpsrv(SOCKET* pSock, char* address, char* port, int maxnbcli, in
 	// The sockaddr_in structure specifies the address family,
 	// IP address, and port of the server.
 	sa.sin_family = AF_INET;
-	sa.sin_addr.s_addr = inet_addr(address);
 	sa.sin_port = htons((unsigned short)atoi(port));
+	sa.sin_addr.s_addr = inet_addr(address);
 
 	// Associate the server to the desired address and port.
 	if (bind(*pSock, (struct sockaddr*)&sa, sizeof(sa)) != EXIT_SUCCESS)
@@ -1029,8 +1029,8 @@ inline int initudpsrv(SOCKET* pSock, char* address, char* port, int timeout)
 	// The sockaddr_in structure specifies the address family,
 	// IP address, and port of the server.
 	sa.sin_family = AF_INET;
-	sa.sin_addr.s_addr = inet_addr(address);
 	sa.sin_port = htons((unsigned short)atoi(port));
+	sa.sin_addr.s_addr = inet_addr(address);
 
 	// Associate the server to the desired address and port.
 	if (bind(*pSock, (struct sockaddr*)&sa, sizeof(sa)) != EXIT_SUCCESS)
@@ -1277,6 +1277,8 @@ inline int waitforcliforudpsrv(SOCKET socksrv, SOCKET* pSockCli, int timeout)
 			(int)socksrv, timeout));
 		return EXIT_FAILURE;
 	}
+
+	// Should create a new socket connected to that client...
 
 	// Set defaults for recv()... and send()...
 	if (connect(socksrv, (struct sockaddr*)&addr, addrlen) != EXIT_SUCCESS)
@@ -2117,7 +2119,7 @@ inline int recvatleastuntilstr(SOCKET sock, char* recvbuf, char* endstr, int max
 				"recvbuf full. ", 
 				(int)sock, recvbuf, endstr, maxrecvbuflen));
 			PRINT_DEBUG_MESSAGE_OSNET(("Total bytes received : %d\n", BytesReceived));
-			return EXIT_FAILURE;
+			return EXIT_OUT_OF_MEMORY;
 		}
 
 		Bytes = recv(sock, recvbuf + BytesReceived, maxrecvbuflen - BytesReceived, 0);
@@ -2190,7 +2192,7 @@ inline int recvatleastuntil(SOCKET sock, char* recvbuf, char endchar, int maxrec
 				"recvbuf full. ", 
 				(int)sock, recvbuf, (int)(unsigned char)endchar, maxrecvbuflen));
 			PRINT_DEBUG_MESSAGE_OSNET(("Total bytes received : %d\n", BytesReceived));
-			return EXIT_FAILURE;
+			return EXIT_OUT_OF_MEMORY;
 		}
 
 		Bytes = recv(sock, recvbuf + BytesReceived, maxrecvbuflen - BytesReceived, 0);
@@ -2276,7 +2278,7 @@ inline int recvuntil(SOCKET sock, char* recvbuf, char endchar, int maxrecvbuflen
 				"recvbuf full. ", 
 				(int)sock, recvbuf, (int)(unsigned char)endchar, maxrecvbuflen));
 			PRINT_DEBUG_MESSAGE_OSNET(("Total bytes received : %d\n", BytesReceived));
-			return EXIT_FAILURE;
+			return EXIT_OUT_OF_MEMORY;
 		}
 
 		// Receive 1 byte.
@@ -2332,7 +2334,8 @@ inline int recvuntilstr(SOCKET sock, char* recvbuf, char* endstr, int maxrecvbuf
 				"recvbuf full. ", 
 				(int)sock, recvbuf, endstr, maxrecvbuflen));
 			PRINT_DEBUG_MESSAGE_OSNET(("Total bytes received : %d\n", BytesReceived));
-			return EXIT_FAILURE;
+			*pBytesReceived = BytesReceived;
+			return EXIT_OUT_OF_MEMORY;
 		}
 
 		// Receive 1 byte.
@@ -2346,6 +2349,7 @@ inline int recvuntilstr(SOCKET sock, char* recvbuf, char* endstr, int maxrecvbuf
 					szOSUtilsErrMsgs[EXIT_TIMEOUT], 
 					(int)sock, recvbuf, endstr, maxrecvbuflen));
 				PRINT_DEBUG_MESSAGE_OSNET(("Total bytes received : %d\n", BytesReceived));
+				*pBytesReceived = BytesReceived;
 				return EXIT_TIMEOUT;
 			}
 			else
@@ -2360,6 +2364,7 @@ inline int recvuntilstr(SOCKET sock, char* recvbuf, char* endstr, int maxrecvbuf
 				WSAGetLastErrorMsg(), 
 				(int)sock, recvbuf, endstr, maxrecvbuflen));
 			PRINT_DEBUG_MESSAGE_OSNET(("Total bytes received : %d\n", BytesReceived));
+			*pBytesReceived = BytesReceived;
 			return EXIT_FAILURE;
 		}
 

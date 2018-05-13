@@ -882,6 +882,104 @@ inline void GetFileNameAndFilePathAndChangeExtension(char* szFileInPath, char* s
 	RemovePathInFilePath(szFileOutName);
 }
 
+#ifndef STRISTR_DEFINED
+#define STRISTR_DEFINED
+// From the Snippets collection SNIP9707.ZIP...
+inline char* stristr(char* String, char* Pattern)
+{
+	char* pptr = NULL;
+	char* sptr = NULL;
+	char* start = NULL;
+
+	for (start = (char*)String; *start != 0; start++)
+	{
+		// Find start of pattern in string.
+		for (; ((*start != 0) && (toupper(*start)!= toupper(*Pattern))); start++)
+			;
+		if (0 == *start)
+			return NULL;
+
+		pptr = (char*)Pattern;
+		sptr = (char*)start;
+
+		while (toupper(*sptr) == toupper(*pptr))
+		{
+			sptr++;
+			pptr++;
+
+			// If end of pattern then pattern was found.
+
+			if (0 == *pptr)
+				return (start);
+		}
+	}
+
+	return NULL;
+}
+#endif // !STRISTR_DEFINED
+
+inline char* strstrbeginend(char* str, char* beginpattern, char* endpattern, char** pOut, int* pOutstrlen)
+{
+	char* ptr = NULL;
+	char* ptr2 = NULL;
+
+	ptr = strstr(str, beginpattern);
+	if (ptr == NULL)
+	{
+		*pOut = NULL;
+		*pOutstrlen = 0;
+		return NULL;
+	}
+	ptr2 = strstr(ptr+strlen(beginpattern), endpattern);
+	if (ptr2 == NULL)
+	{
+		*pOut = NULL;
+		*pOutstrlen = 0;
+		return NULL;
+	}
+	*pOutstrlen = ptr2-(ptr+strlen(beginpattern));
+	if (*pOutstrlen < 0)
+	{
+		*pOut = NULL;
+		*pOutstrlen = 0;
+		return NULL;
+	}
+	*pOut = ptr+strlen(beginpattern);
+
+	return *pOut;
+}
+
+inline char* stristrbeginend(char* str, char* beginpattern, char* endpattern, char** pOut, int* pOutstrlen)
+{
+	char* ptr = NULL;
+	char* ptr2 = NULL;
+
+	ptr = stristr(str, beginpattern);
+	if (ptr == NULL)
+	{
+		*pOut = NULL;
+		*pOutstrlen = 0;
+		return NULL;
+	}
+	ptr2 = stristr(ptr+strlen(beginpattern), endpattern);
+	if (ptr2 == NULL)
+	{
+		*pOut = NULL;
+		*pOutstrlen = 0;
+		return NULL;
+	}
+	*pOutstrlen = ptr2-(ptr+strlen(beginpattern));
+	if (*pOutstrlen < 0)
+	{
+		*pOut = NULL;
+		*pOutstrlen = 0;
+		return NULL;
+	}
+	*pOut = ptr+strlen(beginpattern);
+
+	return *pOut;
+}
+
 inline double sensor_err(double bias_err, double max_rand_err)
 {
 	return bias_err+max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
