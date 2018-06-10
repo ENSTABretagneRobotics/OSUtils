@@ -84,17 +84,15 @@ Debug macros specific to OSMisc.
 //#endif // __GNUC__
 
 // Need to be undefined at the end of the file...
-// min and max might cause incompatibilities on Linux...
-#ifndef _WIN32
-#if !defined(NOMINMAX)
+// min and max might cause incompatibilities with GCC...
+#ifndef _MSC_VER
 #ifndef max
 #define max(a,b) (((a) > (b)) ? (a) : (b))
 #endif // !max
 #ifndef min
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #endif // !min
-#endif // !defined(NOMINMAX)
-#endif // !_WIN32
+#endif // !_MSC_VER
 
 #define MAX_BUF_LEN 256
 
@@ -1703,14 +1701,14 @@ inline void useless_function(int useless_param)
 	printf("This function is not so useless!\n");
 }
 
-// min and max might cause incompatibilities on Linux...
-#ifndef _WIN32
+// min and max might cause incompatibilities with GCC...
+#ifndef _MSC_VER
 #ifdef max
 #undef max
 #endif // max
 #ifdef min
 #undef min
 #endif // min
-#endif // !_WIN32
+#endif // !_MSC_VER
 
 #endif // !OSMISC_H

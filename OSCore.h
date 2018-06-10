@@ -235,20 +235,18 @@ _ Windows CE : WINCE
 #endif // __BORLANDC__
 #ifdef __GNUC__
 // extern __inline__ in ws2tcpip.h for GNU?
+#ifdef _WIN32
+#if !(((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #define inline static __inline__
+#else
+#define inline __inline__
+#endif // !(((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#else
+#define inline static __inline__
+#endif // _WIN32
 #endif // __GNUC__
 #endif // !inline
 #endif // !__cplusplus
-
-// Too many incompatibilities on Linux...
-//#if !defined(NOMINMAX)
-//#ifndef max
-//#define max(a,b) (((a) > (b)) ? (a) : (b))
-//#endif // !max
-//#ifndef min
-//#define min(a,b) (((a) < (b)) ? (a) : (b))
-//#endif // !min
-//#endif // !defined(NOMINMAX)
 
 #ifndef _WIN32
 typedef char CHAR;
@@ -466,8 +464,8 @@ EXTERN_C char* FormatLastErrorMsg(char* buf, int buflen);
 
 #ifdef __GNUC__
 // Disable some GCC warnings.
-#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 #pragma GCC diagnostic push
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
@@ -492,8 +490,6 @@ EXTERN_C char* FormatLastErrorMsg(char* buf, int buflen);
 // Restore the GCC warnings previously disabled.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #pragma GCC diagnostic pop
-#else
-#pragma GCC diagnostic warning "-Wunused-but-set-variable"
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
 

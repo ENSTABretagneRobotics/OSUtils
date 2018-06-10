@@ -1193,6 +1193,7 @@ inline int waitforclifortcpsrv(SOCKET socksrv, SOCKET* pSockCli, int timeout)
 			strtime_m(), 
 			"getnameinfo failed. ", 
 			(int)socksrv, timeout));
+		closesocket(*pSockCli);
 		return EXIT_FAILURE;
 	}
 
@@ -1211,6 +1212,7 @@ int timeout : (IN) Max time to wait in ms (0 to disable timeout).
 Return : EXIT_SUCCESS if there is a client, EXIT_TIMEOUT if there is no client 
 after the timeout elapses or EXIT_FAILURE if there is an error.
 */
+//inline int waitforcliforudpsrv(SOCKET socksrv, SOCKET* pSockCli, int timeout, char* firstdgram, int firstdgramlen)
 inline int waitforcliforudpsrv(SOCKET socksrv, SOCKET* pSockCli, int timeout)
 {
 	fd_set sock_set;
@@ -1264,8 +1266,6 @@ inline int waitforcliforudpsrv(SOCKET socksrv, SOCKET* pSockCli, int timeout)
 		return EXIT_TIMEOUT;
 	}
 
-	//PRINT_DEBUG_MESSAGE_OSNET(("Accepted connection\n"));
-
 	// First datagram will be lost...
 	memset(&addr, 0, sizeof(addr));
 	addrlen = sizeof(addr);
@@ -1278,15 +1278,39 @@ inline int waitforcliforudpsrv(SOCKET socksrv, SOCKET* pSockCli, int timeout)
 		return EXIT_FAILURE;
 	}
 
-	// Should create a new socket connected to that client...
+	// Should create a new socket connected to that client...?
 
+	//// Create a UDP IPv4 socket.
+	//*pSockCli = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	//if (*pSockCli == INVALID_SOCKET)
+	//{
+	//	PRINT_DEBUG_ERROR_OSNET(("waitforcliforudpsrv error (%s) : %s(socksrv=%d, timeout=%d)\n", 
+	//		strtime_m(), 
+	//		WSAGetLastErrorMsg(), 
+	//		(int)socksrv, timeout));
+	//	return EXIT_FAILURE;
+	//}
+
+	//// Configure timeouts for send and recv.
+	//if (setsockettimeouts(*pSockCli, DEFAULT_SOCK_TIMEOUT) != EXIT_SUCCESS)
+	//{
+	//	PRINT_DEBUG_ERROR_OSNET(("waitforcliforudpsrv error (%s) : %s(socksrv=%d, timeout=%d)\n", 
+	//		strtime_m(), 
+	//		WSAGetLastErrorMsg(), 
+	//		(int)socksrv, timeout));
+	//	closesocket(*pSockCli);
+	//	return EXIT_FAILURE;
+	//}
+	
 	// Set defaults for recv()... and send()...
+	//if (connect(*pSockCli, (struct sockaddr*)&addr, addrlen) != EXIT_SUCCESS)
 	if (connect(socksrv, (struct sockaddr*)&addr, addrlen) != EXIT_SUCCESS)
 	{
 		PRINT_DEBUG_ERROR_OSNET(("waitforcliforudpsrv error (%s) : %s(socksrv=%d, timeout=%d)\n", 
 			strtime_m(), 
 			WSAGetLastErrorMsg(), 
 			(int)socksrv, timeout));
+		//closesocket(*pSockCli);
 		return EXIT_FAILURE;
 	}
 
@@ -1298,6 +1322,7 @@ inline int waitforcliforudpsrv(SOCKET socksrv, SOCKET* pSockCli, int timeout)
 			strtime_m(), 
 			"getnameinfo failed. ", 
 			(int)socksrv, timeout));
+		//closesocket(*pSockCli);
 		return EXIT_FAILURE;
 	}
 
@@ -1353,17 +1378,17 @@ Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
 */
 inline int disconnectclifromudpsrv(SOCKET sock)
 {
-	
-	// Should create another socket correctly bound in waitforcliudpsrv()...
+
+	// Should create another socket correctly bound in waitforcliudpsrv()...?
 
 	UNREFERENCED_PARAMETER(sock);
 
 	//// Shutdown the connection.
 	//if (shutdown(sock, SD_BOTH) != EXIT_SUCCESS)
 	//{
-	//	PRINT_DEBUG_WARNING_OSNET(("disconnectclifromudpsrv warning (%s) : %s(sock=%d)\n", 
-	//		strtime_m(), 
-	//		"shutdown failed. ", 
+	//	PRINT_DEBUG_WARNING_OSNET(("disconnectclifromudpsrv warning (%s) : %s(sock=%d)\n",
+	//		strtime_m(),
+	//		"shutdown failed. ",
 	//		(int)sock));
 	//	//return EXIT_FAILURE;
 	//}
@@ -1371,9 +1396,9 @@ inline int disconnectclifromudpsrv(SOCKET sock)
 	//// Destroy the socket created by socket().
 	//if (closesocket(sock) != EXIT_SUCCESS)
 	//{
-	//	PRINT_DEBUG_ERROR_OSNET(("disconnectclifromudpsrv error (%s) : %s(sock=%d)\n", 
-	//		strtime_m(), 
-	//		"closesocket failed. ", 
+	//	PRINT_DEBUG_ERROR_OSNET(("disconnectclifromudpsrv error (%s) : %s(sock=%d)\n",
+	//		strtime_m(),
+	//		"closesocket failed. ",
 	//		(int)sock));
 	//	return EXIT_FAILURE;
 	//}
