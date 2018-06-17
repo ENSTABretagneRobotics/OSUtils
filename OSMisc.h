@@ -1263,6 +1263,32 @@ inline void RefCoordSystem2GPS(double lat0, double long0, double alt0,
 	}
 }
 
+inline double longitude180handling(double long0, double longa, double longb, double longitude)
+{
+	if ((((longa >= 90)&&(longa <= 180))&&((longb >= -180)&&(longb <= -90)))||
+		(((longb >= 90)&&(longb <= 180))&&((longa >= -180)&&(longa <= -90))))
+	{
+		if (long0 >= 0)
+		{
+			if (longitude < 0) return longitude+360;
+		}
+		else
+		{
+			if (longitude > 0) return longitude-360;
+		}
+	}
+	return longitude;
+}
+
+inline void LineGPS2RefCoordSystem(double lat0, double long0, double alt0, 
+							double lata, double longa, double alta, double latb, double longb, double altb, 
+							double* pax, double* pay, double* paz, double* pbx, double* pby, double* pbz, 
+							int cstype)
+{
+	GPS2RefCoordSystem(lat0, long0, alt0, lata, longitude180handling(long0, longa, longb, longa), alta, pax, pay, paz, cstype);
+	GPS2RefCoordSystem(lat0, long0, alt0, latb, longitude180handling(long0, longa, longb, longb), altb, pbx, pby, pbz, cstype);
+}
+
 // angle_env : Angle of the x axis of the environment coordinate system 
 // w.r.t. an East - North - Up coordinate system, should be set to 0 if no 
 // specific environment (i.e. an East - North - Up coordinate system) 
