@@ -243,7 +243,18 @@ inline int InitNet(void)
 			"WSAStartup failed. "));
 		return EXIT_FAILURE;
 	}
-#endif
+#else
+#ifndef DISABLE_IGNORE_SIGPIPE
+	// See https://stackoverflow.com/questions/17332646/server-dies-on-send-if-client-was-closed-with-ctrlc...
+	if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+	{
+		PRINT_DEBUG_WARNING_OSNET(("InitNet warning (%s) : %s"
+			"\n",
+			strtime_m(),
+			"signal failed. "));
+	}
+#endif // DISABLE_IGNORE_SIGPIPE
+#endif // _WIN32
 
 	return EXIT_SUCCESS;
 }
