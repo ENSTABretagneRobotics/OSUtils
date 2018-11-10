@@ -176,6 +176,29 @@ inline double quantification(double v, double step)
 	return floor(v/step+0.5)*step;
 }
 
+// In rad.
+inline void quaternion2euler(double qw, double qx, double qy, double qz, double* pRoll, double* pPitch, double* pYaw)
+{
+	*pRoll = atan2(2*qy*qz+2*qw*qx, 2*sqr(qw)+2*sqr(qz)-1);
+	*pPitch = -asin(constrain(2*qx*qz-2*qw*qy, -1, 1)); // Attempt to avoid potential NAN...
+	*pYaw = atan2(2*qx*qy+2*qw*qz, 2*sqr(qw)+2*sqr(qx)-1);
+}
+
+// In rad.
+inline void euler2quaternion(double roll, double pitch, double yaw, double* pQw, double* pQx, double* pQy, double* pQz)
+{
+	double t0 = cos(yaw * 0.5);
+	double t1 = sin(yaw * 0.5);
+	double t2 = cos(roll * 0.5);
+	double t3 = sin(roll * 0.5);
+	double t4 = cos(pitch * 0.5);
+	double t5 = sin(pitch * 0.5);
+	*pQw = t0 * t2 * t4 + t1 * t3 * t5;
+	*pQx = t0 * t3 * t4 - t1 * t2 * t5;
+	*pQy = t0 * t2 * t5 + t1 * t3 * t4;
+	*pQz = t1 * t2 * t4 - t0 * t3 * t5;
+}
+
 /*
 Get the depth from the pressure (pressure difference = density x g x height).
 
@@ -935,7 +958,7 @@ inline char* strstrbeginend(char* str, char* beginpattern, char* endpattern, cha
 		*pOutstrlen = 0;
 		return NULL;
 	}
-	*pOutstrlen = ptr2-(ptr+strlen(beginpattern));
+	*pOutstrlen = (int)(ptr2-(ptr+strlen(beginpattern)));
 	if (*pOutstrlen < 0)
 	{
 		*pOut = NULL;
@@ -966,7 +989,7 @@ inline char* stristrbeginend(char* str, char* beginpattern, char* endpattern, ch
 		*pOutstrlen = 0;
 		return NULL;
 	}
-	*pOutstrlen = ptr2-(ptr+strlen(beginpattern));
+	*pOutstrlen = (int)(ptr2-(ptr+strlen(beginpattern)));
 	if (*pOutstrlen < 0)
 	{
 		*pOut = NULL;
