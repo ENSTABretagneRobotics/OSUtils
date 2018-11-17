@@ -75,6 +75,13 @@ Debug macros specific to OSMisc.
 #endif // _WIN32
 #endif // !DISABLE_USER_INPUT_FUNCTIONS
 
+#ifndef DISABLE_REBOOT_FUNCTIONS
+#ifdef _WIN32
+#else 
+#include <sys/reboot.h>
+#endif // _WIN32
+#endif // !DISABLE_REBOOT_FUNCTIONS
+
 //// To check...
 //#ifdef __GNUC__
 //#define _stricmp strcasecmp
@@ -1634,6 +1641,24 @@ inline void RGB2HSL_MSPaint(double red, double green, double blue, double* pH, d
 	*pS = saturation*240.0; 
 	*pL = luminance*240.0;
 }
+
+#ifndef DISABLE_REBOOT_FUNCTIONS
+inline void RebootComputer(void)
+{
+#ifdef _WIN32
+	if (!InitiateSystemShutdown(NULL, NULL, 0, TRUE, TRUE))
+	{
+		printf("InitiateSystemShutdown() failed.\n");
+	}
+#else
+	sync();
+	if (reboot(RB_AUTOBOOT) < 0)
+	{
+		printf("reboot() failed.\n");
+	}
+#endif // _WIN32
+}
+#endif // !DISABLE_REBOOT_FUNCTIONS
 
 /*
 Wait for the user to press the ENTER key.
