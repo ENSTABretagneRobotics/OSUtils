@@ -412,6 +412,7 @@ Return : This string.
 */
 EXTERN_C char* strtime_m(void);
 
+#if (defined(_WIN32) && (defined(ENABLE_GETTIMEOFDAY_WIN32) || defined(ENABLE_SYS_TIME_H_WIN32))) || (!defined(_WIN32))
 /*
 Return a string like ctime() but in this format :
 
@@ -424,6 +425,7 @@ be changed by another thread.
 Return : This string.
 */
 EXTERN_C char* strtimeex_m(void);
+#endif // (defined(_WIN32) && (defined(ENABLE_GETTIMEOFDAY_WIN32) || defined(ENABLE_SYS_TIME_H_WIN32))) || (!defined(_WIN32))
 
 /*
 Return a string like ctime() but in this format :
@@ -438,6 +440,7 @@ Return : This string.
 */
 EXTERN_C char* strtime_fns(void);
 
+#if (defined(_WIN32) && (defined(ENABLE_GETTIMEOFDAY_WIN32) || defined(ENABLE_SYS_TIME_H_WIN32))) || (!defined(_WIN32))
 /*
 Return a string like ctime() but in this format :
 
@@ -450,6 +453,7 @@ be changed by another thread.
 Return : This string.
 */
 EXTERN_C char* strtimeex_fns(void);
+#endif // (defined(_WIN32) && (defined(ENABLE_GETTIMEOFDAY_WIN32) || defined(ENABLE_SYS_TIME_H_WIN32))) || (!defined(_WIN32))
 
 /*
 Wait some time...

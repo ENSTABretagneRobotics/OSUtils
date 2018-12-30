@@ -143,13 +143,12 @@ inline double sqr(double x)
 #define SIGN_DEFINED
 #ifndef sign
 /*
-Return x/epsilon if x is between -epsilon and epsilon or -1 if x is negative, 
-+1 if x is positive.
+Return +1 if x is positive, -1 if x is negative or x/epsilon if x is between -epsilon and epsilon.
 
 double x : (IN) Value.
 double epsilon : (IN) Threshold.
 
-Return : -1, +1 or x/epsilon.
+Return : +1, -1 or x/epsilon.
 */
 inline double sign(double x, double epsilon)
 { 
