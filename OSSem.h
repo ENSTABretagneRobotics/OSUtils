@@ -252,6 +252,7 @@ inline int TryAndGetSemaphore(SEMAPHORE* pSemaphore)
 	return EXIT_SUCCESS;
 }
 
+#if defined(_WIN32) || !defined(USE_OLD_CHRONO)
 /*
 Decrease the count of a semaphore or block until the semaphore be available or 
 a timeout elapses.
@@ -329,5 +330,6 @@ inline int WaitAndGetSemaphore(SEMAPHORE* pSemaphore, int timeout)
 
 	return EXIT_SUCCESS;
 }
+#endif // defined(_WIN32) || !defined(USE_OLD_CHRONO)
 
 #endif // !OSSEM_H

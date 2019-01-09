@@ -49,6 +49,8 @@ _ 64 bit Linux : __linux__ & _LP64
 
 _ Android : __ANDROID__
 
+_ Mac OS : __APPLE__
+
 _ Windows CE : WINCE
 
 */

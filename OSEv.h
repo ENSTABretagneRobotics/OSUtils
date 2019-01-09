@@ -379,6 +379,7 @@ inline int CheckEvent(EVENT* pEvent)
 	return EXIT_SUCCESS;
 }
 
+#if defined(_WIN32) || !defined(USE_OLD_CHRONO)
 /*
 Wait for an event to be signaled or a timeout elapse.
 
@@ -491,5 +492,6 @@ inline int WaitForEvent(EVENT* pEvent, int timeout)
 
 	return EXIT_SUCCESS;
 }
+#endif // defined(_WIN32) || !defined(USE_OLD_CHRONO)
 
 #endif // !OSEV_H

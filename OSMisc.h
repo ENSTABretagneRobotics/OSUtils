@@ -1647,13 +1647,13 @@ inline void RebootComputer(void)
 #ifdef _WIN32
 	if (!InitiateSystemShutdown(NULL, NULL, 0, TRUE, TRUE))
 	{
-		printf("InitiateSystemShutdown() failed.\n");
+		PRINT_DEBUG_ERROR_OSMISC(("RebootComputer error (%s) : %s\n", strtime_m(), GetLastErrorMsg()));
 	}
 #else
 	sync();
 	if (reboot(RB_AUTOBOOT) < 0)
 	{
-		printf("reboot() failed.\n");
+		PRINT_DEBUG_ERROR_OSMISC(("RebootComputer error (%s) : %s\n", strtime_m(), GetLastErrorMsg()));
 	}
 #endif // _WIN32
 }
