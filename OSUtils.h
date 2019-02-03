@@ -38,6 +38,7 @@ Created : 2008-07-05
 #include "OSTimer.h" 
 #include "OSProcess.h" 
 #include "OSComputerRS232Port.h" 
+#include "OSComputerI2CBus.h" 
 #include "OSNet.h" 
 #include "OSFdList.h" 
 
