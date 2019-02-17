@@ -70,6 +70,41 @@ Debug macros specific to OSComputerI2CBus.
 #define MAX_COMPUTERI2CBUS_NAME_LENGTH (128-8)
 
 /*
+	// https://www.kernel.org/doc/Documentation/i2c/dev-interface
+
+	__u8 reg = 0x10; // Device register to access
+	__s32 res;
+	char buf[10];
+
+	// Using SMBus commands
+	res = i2c_smbus_read_word_data(file, reg);
+	if (res < 0) {
+		// ERROR HANDLING: i2c transaction failed
+	}
+	else {
+		// res contains the read word
+	}
+
+	// Using I2C Write, equivalent of
+	// i2c_smbus_write_word_data(file, reg, 0x6543)
+
+	buf[0] = reg;
+	buf[1] = 0x43;
+	buf[2] = 0x65;
+	if (write(file, buf, 3) != 3) {
+		// ERROR HANDLING: i2c transaction failed
+	}
+
+	// Using I2C Read, equivalent of i2c_smbus_read_byte(file)
+	if (read(file, buf, 1) != 1) {
+		// ERROR HANDLING: i2c transaction failed
+	}
+	else {
+		// buf[0] contains the read byte
+	}
+*/
+
+/*
 Open a computer I2C bus. Use CloseComputerI2CBus() to close it at the end.
 
 HANDLE* phDev : (INOUT) Valid pointer that will receive an identifier of the
@@ -358,41 +393,6 @@ inline int WaitForComputerI2CBus(HANDLE hDev, int timeout, int checkingperiod)
 }
 
 /*
-	// https://www.kernel.org/doc/Documentation/i2c/dev-interface
-
-	__u8 reg = 0x10; // Device register to access
-	__s32 res;
-	char buf[10];
-
-	// Using SMBus commands
-	res = i2c_smbus_read_word_data(file, reg);
-	if (res < 0) {
-		// ERROR HANDLING: i2c transaction failed
-	}
-	else {
-		// res contains the read word
-	}
-
-	// Using I2C Write, equivalent of
-	// i2c_smbus_write_word_data(file, reg, 0x6543)
-
-	buf[0] = reg;
-	buf[1] = 0x43;
-	buf[2] = 0x65;
-	if (write(file, buf, 3) != 3) {
-		// ERROR HANDLING: i2c transaction failed
-	}
-
-	// Using I2C Read, equivalent of i2c_smbus_read_byte(file)
-	if (read(file, buf, 1) != 1) {
-		// ERROR HANDLING: i2c transaction failed
-	}
-	else {
-		// buf[0] contains the read byte
-	}
-*/
-
-/*
 Write data to a computer I2C bus.
 
 HANDLE hDev : (IN) Identifier of the computer I2C bus.
@@ -456,9 +456,9 @@ inline int WriteComputerI2CBus(HANDLE hDev, uint8* writebuf, UINT writebuflen, i
 			hDev, writebuf, writebuflen));
 		return EXIT_FAILURE;
 	}
-#endif // (defined(_WIN32) || (!defined(ENABLE_COMPUTERI2CBUS_SUPPORT)))
 
 	return EXIT_SUCCESS;
+#endif // (defined(_WIN32) || (!defined(ENABLE_COMPUTERI2CBUS_SUPPORT)))
 }
 
 /*
@@ -525,9 +525,9 @@ inline int ReadComputerI2CBus(HANDLE hDev, uint8* readbuf, UINT readbuflen, int*
 			hDev, readbuf, readbuflen));
 		return EXIT_FAILURE;
 	}
-#endif // (defined(_WIN32) || (!defined(ENABLE_COMPUTERI2CBUS_SUPPORT)))
 
 	return EXIT_SUCCESS;
+#endif // (defined(_WIN32) || (!defined(ENABLE_COMPUTERI2CBUS_SUPPORT)))
 }
 
 /*
