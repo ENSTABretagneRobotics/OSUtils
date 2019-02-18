@@ -231,39 +231,35 @@ inline int SetSlaveComputerI2CBus(HANDLE hDev, UINT addr, BOOL bTenBit, BOOL bPE
 	}
 	if (ioctl((intptr_t)hDev, I2C_TENBIT, bTenBit) != EXIT_SUCCESS)
 	{
-		PRINT_DEBUG_ERROR_OSCOMPUTERI2CBUS(("SetSlaveComputerI2CBus error (%s) : %s"
+		PRINT_DEBUG_WARNING_OSCOMPUTERI2CBUS(("SetSlaveComputerI2CBus error (%s) : %s"
 			"(hDev=%#x, addr=%u, bTenBit=%d, bPEC=%d, nbretries=%u, timeout=%u)\n",
 			strtime_m(),
 			GetLastErrorMsg(),
 			hDev, addr, bTenBit, bPEC, nbretries, timeout));
-		return EXIT_FAILURE;
 	}
 	if (ioctl((intptr_t)hDev, I2C_PEC, bPEC) != EXIT_SUCCESS)
 	{
-		PRINT_DEBUG_ERROR_OSCOMPUTERI2CBUS(("SetSlaveComputerI2CBus error (%s) : %s"
+		PRINT_DEBUG_WARNING_OSCOMPUTERI2CBUS(("SetSlaveComputerI2CBus error (%s) : %s"
 			"(hDev=%#x, addr=%u, bTenBit=%d, bPEC=%d, nbretries=%u, timeout=%u)\n",
 			strtime_m(),
 			GetLastErrorMsg(),
 			hDev, addr, bTenBit, bPEC, nbretries, timeout));
-		return EXIT_FAILURE;
 	}
 	if (ioctl((intptr_t)hDev, I2C_RETRIES, nbretries) != EXIT_SUCCESS)
 	{
-		PRINT_DEBUG_ERROR_OSCOMPUTERI2CBUS(("SetSlaveComputerI2CBus error (%s) : %s"
+		PRINT_DEBUG_WARNING_OSCOMPUTERI2CBUS(("SetSlaveComputerI2CBus error (%s) : %s"
 			"(hDev=%#x, addr=%u, bTenBit=%d, bPEC=%d, nbretries=%u, timeout=%u)\n",
 			strtime_m(),
 			GetLastErrorMsg(),
 			hDev, addr, bTenBit, bPEC, nbretries, timeout));
-		return EXIT_FAILURE;
 	}
 	if (ioctl((intptr_t)hDev, I2C_TIMEOUT, timeout/10) != EXIT_SUCCESS)
 	{
-		PRINT_DEBUG_ERROR_OSCOMPUTERI2CBUS(("SetSlaveComputerI2CBus error (%s) : %s"
+		PRINT_DEBUG_WARNING_OSCOMPUTERI2CBUS(("SetSlaveComputerI2CBus error (%s) : %s"
 			"(hDev=%#x, addr=%u, bTenBit=%d, bPEC=%d, nbretries=%u, timeout=%u)\n",
 			strtime_m(),
 			GetLastErrorMsg(),
 			hDev, addr, bTenBit, bPEC, nbretries, timeout));
-		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;
 #endif // (defined(_WIN32) || (!defined(ENABLE_COMPUTERI2CBUS_SUPPORT)))
