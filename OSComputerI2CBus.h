@@ -116,6 +116,7 @@ Return : EXIT_SUCCESS, EXIT_NAME_TOO_LONG or EXIT_FAILURE.
 inline int OpenComputerI2CBus(HANDLE* phDev, char* szDevice)
 {
 #if (defined(_WIN32) || (!defined(ENABLE_COMPUTERI2CBUS_SUPPORT)))
+	UNREFERENCED_PARAMETER(szDevice);
 	*phDev = (HANDLE)-1;
 	PRINT_DEBUG_ERROR_OSCOMPUTERI2CBUS(("OpenComputerI2CBus error (%s) : %s"
 		"(szDevice=%s)\n",
@@ -180,6 +181,7 @@ Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
 inline int CloseComputerI2CBus(HANDLE hDev)
 {
 #if (defined(_WIN32) || (!defined(ENABLE_COMPUTERI2CBUS_SUPPORT)))
+	UNREFERENCED_PARAMETER(hDev);
 	PRINT_DEBUG_ERROR_OSCOMPUTERI2CBUS(("CloseComputerI2CBus error (%s) : %s(hDev=%#x)\n",
 		strtime_m(),
 		szOSUtilsErrMsgs[EXIT_NOT_IMPLEMENTED],
@@ -213,6 +215,12 @@ Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
 inline int SetSlaveComputerI2CBus(HANDLE hDev, UINT addr, BOOL bTenBit, BOOL bPEC, UINT nbretries, UINT timeout)
 {
 #if (defined(_WIN32) || (!defined(ENABLE_COMPUTERI2CBUS_SUPPORT)))
+	UNREFERENCED_PARAMETER(hDev);
+	UNREFERENCED_PARAMETER(addr);
+	UNREFERENCED_PARAMETER(bTenBit);
+	UNREFERENCED_PARAMETER(bPEC);
+	UNREFERENCED_PARAMETER(nbretries);
+	UNREFERENCED_PARAMETER(timeout);
 	PRINT_DEBUG_ERROR_OSCOMPUTERI2CBUS(("SetSlaveComputerI2CBus error (%s) : %s"
 		"(hDev=%#x, addr=%u, bTenBit=%d, bPEC=%d, nbretries=%u, timeout=%u)\n",
 		strtime_m(),
@@ -276,6 +284,7 @@ Return : EXIT_SUCCESS if there is data to read, EXIT_TIMEOUT if there is current
 inline int CheckAvailableBytesComputerI2CBus(HANDLE hDev)
 {
 #if (defined(_WIN32) || (!defined(ENABLE_COMPUTERI2CBUS_SUPPORT)))
+	UNREFERENCED_PARAMETER(hDev);
 	PRINT_DEBUG_ERROR_OSCOMPUTERI2CBUS(("CheckAvailableBytesComputerI2CBus error (%s) : %s(hDev=%#x)\n",
 		strtime_m(),
 		szOSUtilsErrMsgs[EXIT_NOT_IMPLEMENTED],
@@ -310,6 +319,9 @@ Return : EXIT_SUCCESS if there is data to read, EXIT_TIMEOUT if there is current
 inline int WaitForComputerI2CBus(HANDLE hDev, int timeout, int checkingperiod)
 {
 #if (defined(_WIN32) || (!defined(ENABLE_COMPUTERI2CBUS_SUPPORT)))
+	UNREFERENCED_PARAMETER(hDev);
+	UNREFERENCED_PARAMETER(timeout);
+	UNREFERENCED_PARAMETER(checkingperiod);
 	PRINT_DEBUG_ERROR_OSCOMPUTERI2CBUS(("WaitForComputerI2CBus error (%s) : %s"
 		"(hDev=%#x, timeout=%d, checkingperiod=%d)\n",
 		strtime_m(),
@@ -402,6 +414,9 @@ EXIT_FAILURE if there is an error.
 inline int WriteComputerI2CBus(HANDLE hDev, uint8* writebuf, UINT writebuflen, int* pWrittenBytes)
 {
 #if (defined(_WIN32) || (!defined(ENABLE_COMPUTERI2CBUS_SUPPORT)))
+	UNREFERENCED_PARAMETER(hDev);
+	UNREFERENCED_PARAMETER(writebuf);
+	UNREFERENCED_PARAMETER(writebuflen);
 	*pWrittenBytes = -1;
 	PRINT_DEBUG_ERROR_OSCOMPUTERI2CBUS(("WriteComputerI2CBus error (%s) : %s"
 		"(hDev=%#x, writebuf=%#x, writebuflen=%u)\n",
@@ -471,6 +486,9 @@ EXIT_FAILURE if there is an error.
 inline int ReadComputerI2CBus(HANDLE hDev, uint8* readbuf, UINT readbuflen, int* pReadBytes)
 {
 #if (defined(_WIN32) || (!defined(ENABLE_COMPUTERI2CBUS_SUPPORT)))
+	UNREFERENCED_PARAMETER(hDev);
+	UNREFERENCED_PARAMETER(readbuf);
+	UNREFERENCED_PARAMETER(readbuflen);
 	*pReadBytes = -1;
 	PRINT_DEBUG_ERROR_OSCOMPUTERI2CBUS(("ReadComputerI2CBus error (%s) : %s"
 		"(hDev=%#x, readbuf=%#x, readbuflen=%u)\n",
@@ -539,6 +557,9 @@ EXIT_FAILURE if there is an error.
 inline int WriteAllComputerI2CBus(HANDLE hDev, uint8* writebuf, UINT writebuflen)
 {
 #if (defined(_WIN32) || (!defined(ENABLE_COMPUTERI2CBUS_SUPPORT)))
+	UNREFERENCED_PARAMETER(hDev);
+	UNREFERENCED_PARAMETER(writebuf);
+	UNREFERENCED_PARAMETER(writebuflen);
 	PRINT_DEBUG_ERROR_OSCOMPUTERI2CBUS(("WriteAllComputerI2CBus error (%s) : %s"
 		"(hDev=%#x, writebuf=%#x, writebuflen=%u)\n",
 		strtime_m(),
@@ -630,6 +651,9 @@ EXIT_FAILURE if there is an error.
 inline int ReadAllComputerI2CBus(HANDLE hDev, uint8* readbuf, UINT readbuflen)
 {
 #if (defined(_WIN32) || (!defined(ENABLE_COMPUTERI2CBUS_SUPPORT)))
+	UNREFERENCED_PARAMETER(hDev);
+	UNREFERENCED_PARAMETER(readbuf);
+	UNREFERENCED_PARAMETER(readbuflen);
 	PRINT_DEBUG_ERROR_OSCOMPUTERI2CBUS(("ReadAllComputerI2CBus error (%s) : %s"
 		"(hDev=%#x, readbuf=%#x, readbuflen=%u)\n",
 		strtime_m(),
