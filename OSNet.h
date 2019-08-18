@@ -107,6 +107,12 @@ Debug macros specific to OSNet.
 #define DEFAULT_SOCK_TIMEOUT 10000
 #endif // !DEFAULT_SOCK_TIMEOUT
 
+#define OTHER_DEV_TYPE_OSNET 0
+#define TCP_CLIENT_DEV_TYPE_OSNET 1
+#define TCP_SERVER_DEV_TYPE_OSNET 2
+#define UDP_CLIENT_DEV_TYPE_OSNET 3
+#define UDP_SERVER_DEV_TYPE_OSNET 4
+
 #ifdef _WIN32
 /*
 Format a message corresponding to the last error in a system call related 
@@ -2471,6 +2477,176 @@ inline int recvuntilstr(SOCKET sock, char* recvbuf, char* endstr, int maxrecvbuf
 	PRINT_DEBUG_MESSAGE_OSNET(("Total bytes received : %d\n", BytesReceived));
 
 	*pBytesReceived = BytesReceived;
+
+	return EXIT_SUCCESS;
+}
+
+/*
+Get address, port and type from a path.
+
+char* szDevPath : (IN) Server TCP port (e.g. :4001), client IP address and TCP port (e.g. 127.0.0.1:4001),
+server UDP port (udp:4001), client IP address and UDP port (e.g. udp://127.0.0.1:4001) or an other path.
+char* address : (OUT) IPv4 address found.
+size_t addresslen : (IN) Number of bytes of the address buffer.
+char* port : (OUT) TCP or UDP port found.
+size_t portlen : (IN) Number of bytes of the port buffer.
+int* pDevType: (OUT) OTHER_DEV_TYPE_OSNET, TCP_CLIENT_DEV_TYPE_OSNET, TCP_SERVER_DEV_TYPE_OSNET, UDP_CLIENT_DEV_TYPE_OSNET or UDP_SERVER_DEV_TYPE_OSNET.
+
+Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
+*/
+inline int GetAddrPortTypeFromDevPath(char* szDevPath, char* address, size_t addresslen, char* port, size_t portlen, int* pDevType)
+{
+	char* ptr = NULL;
+	char* ptr2 = NULL;
+	size_t tmplen = 0;
+
+	if ((szDevPath == NULL)||(address == NULL)||(port == NULL)||(pDevType == NULL)||(addresslen < 16)||(portlen < 6)) return EXIT_FAILURE;
+
+	address[0] = 0;
+	port[0] = 0;
+	*pDevType = OTHER_DEV_TYPE_OSNET;
+
+	ptr = strchr(szDevPath, ':');
+	if ((ptr != NULL)&&(strlen(ptr) >= 6)) ptr2 = strchr(ptr+1, ':');
+
+	if ((strlen(szDevPath) >= 12+7+1+1)&&(strncmp(szDevPath, "tcp-connect:", strlen("tcp-connect:")) == 0)&&(ptr2 != NULL)&&(ptr2[1] != 0))
+	{
+		tmplen = ptr2-(szDevPath+12);
+		if ((addresslen < tmplen+1)||(portlen < strlen(ptr2+1)+1)) return EXIT_FAILURE;
+		memcpy(address, szDevPath+12, tmplen);
+		address[tmplen+1] = 0;
+		strcpy(port, ptr2+1);
+		*pDevType = TCP_CLIENT_DEV_TYPE_OSNET;
+	}
+	else if ((strlen(szDevPath) >= 11+7+1+1)&&(strncmp(szDevPath, "tcp-listen:", strlen("tcp-listen:")) == 0)&&(ptr2 != NULL)&&(ptr2[1] != 0))
+	{
+		tmplen = ptr2-(szDevPath+11);
+		if ((addresslen < tmplen+1)||(portlen < strlen(ptr2+1)+1)) return EXIT_FAILURE;
+		memcpy(address, szDevPath+11, tmplen);
+		address[tmplen+1] = 0;
+		strcpy(port, ptr2+1);
+		*pDevType = TCP_SERVER_DEV_TYPE_OSNET;
+	}
+	else if ((strlen(szDevPath) >= 11+7+1+1)&&(strncmp(szDevPath, "udp-listen:", strlen("udp-listen:")) == 0)&&(ptr2 != NULL)&&(ptr2[1] != 0))
+	{
+		tmplen = ptr2-(szDevPath+11);
+		if ((addresslen < tmplen+1)||(portlen < strlen(ptr2+1)+1)) return EXIT_FAILURE;
+		memcpy(address, szDevPath+11, tmplen);
+		address[tmplen+1] = 0;
+		strcpy(port, ptr2+1);
+		*pDevType = UDP_SERVER_DEV_TYPE_OSNET;
+	}
+	else if ((strlen(szDevPath) >= 9+7+1+1)&&((strncmp(szDevPath, "tcpsrv://", strlen("tcpsrv://")) == 0)||(strncmp(szDevPath, "tcpsvr://", strlen("tcpsvr://")) == 0))&&(ptr2 != NULL)&&(ptr2[1] != 0))
+	{
+		tmplen = ptr2-(szDevPath+9);
+		if ((addresslen < tmplen+1)||(portlen < strlen(ptr2+1)+1)) return EXIT_FAILURE;
+		memcpy(address, szDevPath+9, tmplen);
+		address[tmplen+1] = 0;
+		strcpy(port, ptr2+1);
+		*pDevType = TCP_SERVER_DEV_TYPE_OSNET;
+	}
+	else if ((strlen(szDevPath) >= 9+7+1+1)&&((strncmp(szDevPath, "udpsrv://", strlen("udpsrv://")) == 0)||(strncmp(szDevPath, "udpsvr://", strlen("udpsvr://")) == 0))&&(ptr2 != NULL)&&(ptr2[1] != 0))
+	{
+		tmplen = ptr2-(szDevPath+9);
+		if ((addresslen < tmplen+1)||(portlen < strlen(ptr2+1)+1)) return EXIT_FAILURE;
+		memcpy(address, szDevPath+9, tmplen);
+		address[tmplen+1] = 0;
+		strcpy(port, ptr2+1);
+		*pDevType = UDP_SERVER_DEV_TYPE_OSNET;
+	}
+	else if ((strlen(szDevPath) >= 7+7+1+1)&&((strncmp(szDevPath, "tcpsrv:", strlen("tcpsrv:")) == 0)||(strncmp(szDevPath, "tcpsvr:", strlen("tcpsvr:")) == 0))&&(ptr2 != NULL)&&(ptr2[1] != 0))
+	{
+		tmplen = ptr2-(szDevPath+7);
+		if ((addresslen < tmplen+1)||(portlen < strlen(ptr2+1)+1)) return EXIT_FAILURE;
+		memcpy(address, szDevPath+7, tmplen);
+		address[tmplen+1] = 0;
+		strcpy(port, ptr2+1);
+		*pDevType = TCP_SERVER_DEV_TYPE_OSNET;
+	}
+	else if ((strlen(szDevPath) >= 7+7+1+1)&&((strncmp(szDevPath, "udpsrv:", strlen("udpsrv:")) == 0)||(strncmp(szDevPath, "udpsvr:", strlen("udpsvr:")) == 0))&&(ptr2 != NULL)&&(ptr2[1] != 0))
+	{
+		tmplen = ptr2-(szDevPath+7);
+		if ((addresslen < tmplen+1)||(portlen < strlen(ptr2+1)+1)) return EXIT_FAILURE;
+		memcpy(address, szDevPath+7, tmplen);
+		address[tmplen+1] = 0;
+		strcpy(port, ptr2+1);
+		*pDevType = UDP_SERVER_DEV_TYPE_OSNET;
+	}
+	else if ((strlen(szDevPath) >= 6+7+1+1)&&(strncmp(szDevPath, "tcp://", strlen("tcp://")) == 0)&&(ptr2 != NULL)&&(ptr2[1] != 0))
+	{
+		tmplen = ptr2-(szDevPath+6);
+		if ((addresslen < tmplen+1)||(portlen < strlen(ptr2+1)+1)) return EXIT_FAILURE;
+		memcpy(address, szDevPath+6, tmplen);
+		address[tmplen+1] = 0;
+		strcpy(port, ptr2+1);
+		*pDevType = TCP_CLIENT_DEV_TYPE_OSNET;
+	}
+	else if ((strlen(szDevPath) >= 6+7+1+1)&&(strncmp(szDevPath, "udp://", strlen("udp://")) == 0)&&(ptr2 != NULL)&&(ptr2[1] != 0))
+	{
+		tmplen = ptr2-(szDevPath+6);
+		if ((addresslen < tmplen+1)||(portlen < strlen(ptr2+1)+1)) return EXIT_FAILURE;
+		memcpy(address, szDevPath+6, tmplen);
+		address[tmplen+1] = 0;
+		strcpy(port, ptr2+1);
+		*pDevType = UDP_CLIENT_DEV_TYPE_OSNET;
+	}
+	else if ((strlen(szDevPath) >= 4+7+1+1)&&(strncmp(szDevPath, "tcp:", strlen("tcp:")) == 0)&&(ptr2 != NULL)&&(ptr2[1] != 0))
+	{
+		tmplen = ptr2-(szDevPath+4);
+		if ((addresslen < tmplen+1)||(portlen < strlen(ptr2+1)+1)) return EXIT_FAILURE;
+		memcpy(address, szDevPath+4, tmplen);
+		address[tmplen+1] = 0;
+		strcpy(port, ptr2+1);
+		*pDevType = TCP_CLIENT_DEV_TYPE_OSNET;
+	}
+	else if ((strlen(szDevPath) >= 4+7+1+1)&&(strncmp(szDevPath, "udp:", strlen("udp:")) == 0)&&(ptr2 != NULL)&&(ptr2[1] != 0))
+	{
+		tmplen = ptr2-(szDevPath+4);
+		if ((addresslen < tmplen+1)||(portlen < strlen(ptr2+1)+1)) return EXIT_FAILURE;
+		memcpy(address, szDevPath+4, tmplen);
+		address[tmplen+1] = 0;
+		strcpy(port, ptr2+1);
+		*pDevType = UDP_CLIENT_DEV_TYPE_OSNET;
+	}
+	else if ((strlen(szDevPath) >= 7+1)&&((strncmp(szDevPath, "tcpsrv:", strlen("tcpsrv:")) == 0)||(strncmp(szDevPath, "tcpsvr:", strlen("tcpsvr:")) == 0))&&(atoi(szDevPath+4) > 0))
+	{
+		if (portlen < strlen(szDevPath+7)+1) return EXIT_FAILURE;
+		strcpy(port, szDevPath+7);
+		*pDevType = TCP_SERVER_DEV_TYPE_OSNET;
+	}
+	else if ((strlen(szDevPath) >= 7+1)&&((strncmp(szDevPath, "udpsrv:", strlen("udpsrv:")) == 0)||(strncmp(szDevPath, "udpsvr:", strlen("udpsvr:")) == 0))&&(atoi(szDevPath+4) > 0))
+	{
+		if (portlen < strlen(szDevPath+7)+1) return EXIT_FAILURE;
+		strcpy(port, szDevPath+7);
+		*pDevType = UDP_SERVER_DEV_TYPE_OSNET;
+	}
+	else if ((strlen(szDevPath) >= 4+1)&&(strncmp(szDevPath, "tcp:", strlen("tcp:")) == 0)&&(atoi(szDevPath+4) > 0))
+	{
+		if (portlen < strlen(szDevPath+4)+1) return EXIT_FAILURE;
+		strcpy(port, szDevPath+4);
+		*pDevType = TCP_SERVER_DEV_TYPE_OSNET;
+	}
+	else if ((strlen(szDevPath) >= 4+1)&&(strncmp(szDevPath, "udp:", strlen("udp:")) == 0)&&(atoi(szDevPath+4) > 0))
+	{
+		if (portlen < strlen(szDevPath+4)+1) return EXIT_FAILURE;
+		strcpy(port, szDevPath+4);
+		*pDevType = UDP_SERVER_DEV_TYPE_OSNET;
+	}
+	else if ((ptr != NULL)&&(szDevPath[0] == ':')&&(atoi(szDevPath+1) > 0))
+	{
+		if (portlen < strlen(szDevPath+1)+1) return EXIT_FAILURE;
+		strcpy(port, szDevPath+1);
+		*pDevType = TCP_SERVER_DEV_TYPE_OSNET;
+	}
+	else if ((ptr != NULL)&&(atoi(ptr+1) > 0)&&(isdigit((unsigned char)szDevPath[0])))
+	{
+		tmplen = ptr-szDevPath;
+		if ((addresslen < tmplen+1)||(portlen < strlen(ptr+1)+1)) return EXIT_FAILURE;
+		memcpy(address, szDevPath, tmplen);
+		address[tmplen+1] = 0;
+		strcpy(port, ptr+1);
+		*pDevType = TCP_CLIENT_DEV_TYPE_OSNET;
+	}
 
 	return EXIT_SUCCESS;
 }
