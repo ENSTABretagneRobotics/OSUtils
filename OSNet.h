@@ -78,11 +78,9 @@ Debug macros specific to OSNet.
 #pragma warn -8004
 #endif // __BORLANDC__
 #include <winsock2.h>
+#include <ws2tcpip.h>
 #if (_WIN32_WINNT <= 0x0500)
-#include <ws2tcpip.h>
 #include <Wspiapi.h>
-#else
-#include <ws2tcpip.h>
 #endif // (_WIN32_WINNT <= 0x0500)
 //#include <iphlpapi.h>
 #ifdef __BORLANDC__
@@ -362,7 +360,7 @@ Return : The socket created or INVALID_SOCKET if there is an error.
 //SOCKET socket(int af, int type, int protocol);
 
 /*
-Close an existing socket. 
+Close an existing socket (defined as close() for Linux). 
 InitNet() must be called before using any network function.
 
 SOCKET s : (IN) Socket to close.
@@ -409,16 +407,16 @@ at least one socket meets the specified criteria depending on timeout. Upon retu
 are updated to reflect the subset of the sockets that meet the specified condition. 
 Macros to manipulate and check fd_set contents :
 
-FD_ZERO(*set) 
+FD_ZERO(fd_set* set) 
 Initialize the set to the null set.
 
-FD_SET(s, *set) 
+FD_SET(int s, fd_set* set) 
 Add socket s to set.
 
-FD_ISSET(s, *set) 
+FD_ISSET(int s, fd_set* set) 
 Nonzero if s is a member of the set. Otherwise, 0.
 
-FD_CLR(s, *set) 
+FD_CLR(int s, fd_set* set) 
 Remove the socket s from set.
 
 Structure to define the timeout :
@@ -480,9 +478,9 @@ Return : EXIT_SUCCESS or SOCKET_ERROR if there is an error.
 */
 //int connect(SOCKET s, struct sockaddr* name, int namelen);
 
-//int send(SOCKET s);
+//int send(SOCKET s, char* buf, int len, int flags);
 
-//int recv(SOCKET s);
+//int recv(SOCKET s, char* buf, int len, int flags);
 
 /*
 Usually used with UDP sockets.
@@ -600,6 +598,54 @@ inline int setsocketreuseaddr(SOCKET sock, BOOL reuseaddr)
 
 	return EXIT_SUCCESS;
 }
+
+#ifndef DISABLE_IOCTLSOCKET
+/*
+Set blocking mode for a socket.
+
+SOCKET sock : (IN) Socket.
+BOOL blocking : (IN) 1 to make blocking, 0 to non-blocking.
+
+Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
+*/
+inline int setsocketblocking(SOCKET sock, BOOL blocking)
+{
+#ifdef _WIN32
+	unsigned long blockingMode = (blocking? 0: 1);
+
+	if (ioctlsocket(sock, FIONBIO, &blockingMode) != NO_ERROR)
+	{
+		PRINT_DEBUG_ERROR_OSNET(("setsocketblocking error (%s) : %s(sock=%d, blocking=%d)\n",
+			strtime_m(),
+			WSAGetLastErrorMsg(),
+			(int)sock, (int)blocking));
+		return EXIT_FAILURE;
+	}
+#else
+	int flags = fcntl(sock, F_GETFL, 0);
+
+	if (flags == -1)
+	{
+		PRINT_DEBUG_ERROR_OSNET(("setsocketblocking error (%s) : %s(sock=%d, blocking=%d)\n",
+			strtime_m(),
+			WSAGetLastErrorMsg(),
+			(int)sock, (int)blocking));
+		return EXIT_FAILURE;
+	}
+	flags = (blocking? (flags&~O_NONBLOCK): (flags|O_NONBLOCK));
+	if (fcntl(sock, F_SETFL, flags) != 0)
+	{
+		PRINT_DEBUG_ERROR_OSNET(("setsocketblocking error (%s) : %s(sock=%d, blocking=%d)\n",
+			strtime_m(),
+			WSAGetLastErrorMsg(),
+			(int)sock, (int)blocking));
+		return EXIT_FAILURE;
+	}
+#endif // _WIN32
+
+	return EXIT_SUCCESS;
+}
+#endif // !DISABLE_IOCTLSOCKET
 
 /*
 Connect to an IPv4 TCP server.
