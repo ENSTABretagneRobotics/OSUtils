@@ -487,7 +487,7 @@ inline int SetOptionsComputerRS232Port(HANDLE hDev, UINT BaudRate, BYTE ParityMo
 	timeouts.ReadIntervalTimeout = MAXDWORD;
 	timeouts.ReadTotalTimeoutConstant = timeout;
 	timeouts.ReadTotalTimeoutMultiplier = MAXDWORD;
-	//timeouts.WriteTotalTimeoutConstant = 0; // Linux do not seem to have options for write timeouts, so disable for Windows...
+	//timeouts.WriteTotalTimeoutConstant = 0; // Linux does not seem to have options for write timeouts, so disable for Windows...?
 	timeouts.WriteTotalTimeoutConstant = timeout;
 	timeouts.WriteTotalTimeoutMultiplier = 0;
 
