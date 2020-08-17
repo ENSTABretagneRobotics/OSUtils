@@ -73,9 +73,12 @@ Debug macros specific to OSMisc.
 #else 
 #ifndef DISABLE_CUSTOM_BAUDRATE
 #ifdef __linux__
+#pragma push_macro("termios")
+#undef termios
 #define termios termbits_termios
 #include <asm/termbits.h> // Not compatible with termios.h, see https://stackoverflow.com/questions/37710525/including-termios-h-and-asm-termios-h-in-the-same-project...
 #undef termios
+#pragma pop_macro("termios")
 #endif // __linux__
 #endif // !DISABLE_CUSTOM_BAUDRATE
 #include <termios.h>
