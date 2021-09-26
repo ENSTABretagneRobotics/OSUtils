@@ -544,13 +544,12 @@ inline double rect_mv_avg(double newvalue, double oldestvalue, double prevaverag
 	return prevaverage+(newvalue-oldestvalue)/(double)n;
 }
 
-// https://fr.wikipedia.org/wiki/Moyenne_mobile
-// https://en.wikipedia.org/wiki/Moving_average
-// http://www.cafemath.fr/mathblog/article.php?page=MovingAverages.php
 inline double exp_mv_avg(double newvalue, double prevaverage, double alpha)
 {
 	return alpha*prevaverage+(1.0-alpha)*newvalue;
 }
+
+// See also https://gist.github.com/mrfaptastic/3fd6394c5d6294c993d8b42b026578da?
 
 #ifndef FGETS2_DEFINED
 #define FGETS2_DEFINED

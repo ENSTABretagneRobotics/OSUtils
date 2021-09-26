@@ -49,7 +49,17 @@ See http://pubs.opengroup.org/onlinepubs/7908799/xsh/unistd.h.html.
 
 __inline int usleep(unsigned int usec)
 {
-	Sleep(usec/1000);
+	// From https://stackoverflow.com/questions/5801813/c-usleep-is-obsolete-workarounds-for-windows-mingw.
+	HANDLE timer;
+	LARGE_INTEGER ft;
+
+	ft.QuadPart = -(10*(LONGLONG)usec); // Convert to 100 nanosecond interval, negative value indicates relative time.
+
+	timer = CreateWaitableTimer(NULL, TRUE, NULL);
+	SetWaitableTimer(timer, &ft, 0, NULL, NULL, FALSE);
+	//WaitForSingleObject(timer, INFINITE);
+	WaitForSingleObject(timer, (DWORD)(1+usec/1000));
+	CloseHandle(timer);
 	return 0;
 }
 
