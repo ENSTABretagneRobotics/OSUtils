@@ -359,6 +359,12 @@ inline double fmod_2PI_deg2rad(double theta)
 	return fmod(fmod(theta*M_PI/180.0, 2*M_PI)+3*M_PI, 2*M_PI)-M_PI;
 }
 
+// From https://www.ensta-bretagne.fr/jaulin/robmooc.pdf.
+inline double sawtooth(double theta)
+{
+	return 2*atan(tan(theta/2));
+}
+
 #ifndef MEAN_DEFINED
 #define MEAN_DEFINED
 #ifndef mean
@@ -548,6 +554,50 @@ inline double exp_mv_avg(double newvalue, double prevaverage, double alpha)
 }
 
 // See also https://gist.github.com/mrfaptastic/3fd6394c5d6294c993d8b42b026578da?
+
+// From https://www.ensta-bretagne.fr/lebars/Share/comm_file.zip.
+inline int comm_write_val(char* filename, double val)
+{
+	FILE* file = fopen(filename, "w");
+	if (file != NULL)
+	{
+		fprintf(file, "%f\n", val);
+		fclose(file);
+		return EXIT_SUCCESS;
+	}
+	return EXIT_FAILURE;
+}
+
+// From https://www.ensta-bretagne.fr/lebars/Share/comm_file.zip.
+inline int comm_read_val(char* filename, double* pVal)
+{
+	int ret = EXIT_FAILURE;
+	int nb = 0;
+	double val = 0;
+	char c = 0;
+	FILE* file = fopen(filename, "r");
+	if (file != NULL)
+	{
+		nb = fscanf(file, "%lf%c\n", &val, &c);
+		if ((nb == 2)&&((c=='\n')||(c=='\r'))) { *pVal = val; ret = EXIT_SUCCESS; }
+		fclose(file);
+	}
+	return ret;
+}
+
+// See also fwaitchg().
+inline int comm_wait_change_val(char* filename, int msperiod, double prevval, double* pNewVal)
+{
+	int ret = EXIT_FAILURE;
+	for (;;)
+	{
+		double val = 0;
+		if (comm_read_val(filename, &val) == EXIT_SUCCESS) { if (val != prevval) { *pNewVal = val; ret = EXIT_SUCCESS; break; } }
+		else break;
+		mSleep(msperiod);
+	}
+	return ret;
+}
 
 #ifndef FGETS2_DEFINED
 #define FGETS2_DEFINED
@@ -775,6 +825,7 @@ inline int fsetline(FILE* file, int linenumber)
 inline int fload(char* szFilePath, unsigned char* buf, size_t elementsize, size_t count, size_t* pBytesLoaded)
 {
 	FILE* file = NULL;
+	size_t ElemsLoaded = 0;
 
 	file = fopen(szFilePath, "rb");
 
@@ -783,8 +834,8 @@ inline int fload(char* szFilePath, unsigned char* buf, size_t elementsize, size_
 		return EXIT_FAILURE;
 	}
 
-	*pBytesLoaded = fread(buf, elementsize, count, file);
-	if (*pBytesLoaded <= 0)
+	ElemsLoaded = fread(buf, elementsize, count, file);
+	if (ElemsLoaded <= 0)
 	{
 		// Empty file, elementsize or count is 0, or there was an error.
 		fclose(file);
@@ -803,12 +854,15 @@ inline int fload(char* szFilePath, unsigned char* buf, size_t elementsize, size_
 		return EXIT_FAILURE;
 	}
 
+	if (pBytesLoaded) *pBytesLoaded = elementsize*ElemsLoaded;
+
 	return EXIT_SUCCESS;
 }
 
 inline int fsave(char* szFilePath, unsigned char* buf, size_t elementsize, size_t count, size_t* pBytesSaved)
 {
 	FILE* file = NULL;
+	size_t ElemsSaved = 0;
 
 	file = fopen(szFilePath, "wb");
 
@@ -817,8 +871,8 @@ inline int fsave(char* szFilePath, unsigned char* buf, size_t elementsize, size_
 		return EXIT_FAILURE;
 	}
 
-	*pBytesSaved = fwrite(buf, elementsize, count, file);
-	if (*pBytesSaved != elementsize*count)
+	ElemsSaved = fwrite(buf, elementsize, count, file);
+	if (ElemsSaved != count)
 	{
 		fclose(file);
 		return EXIT_FAILURE;
@@ -829,6 +883,8 @@ inline int fsave(char* szFilePath, unsigned char* buf, size_t elementsize, size_
 		return EXIT_FAILURE;
 	}
 
+	if (pBytesSaved) *pBytesSaved = elementsize*ElemsSaved;
+
 	return EXIT_SUCCESS;
 }
 
@@ -836,7 +892,8 @@ inline int fcopyload(char* szFromFilePath, char* szToFilePath, unsigned char* bu
 {
 	FILE* fromfile = NULL;
 	FILE* tofile = NULL;
-	size_t BytesRead = 0;
+	size_t ElemsRead = 0;
+	size_t ElemsCopied = 0;
 
 	fromfile = fopen(szFromFilePath, "rb");
 	if (fromfile == NULL)
@@ -851,8 +908,8 @@ inline int fcopyload(char* szFromFilePath, char* szToFilePath, unsigned char* bu
 		return EXIT_FAILURE;
 	}
 
-	BytesRead = fread(buf, elementsize, count, fromfile);
-	if (BytesRead <= 0)
+	ElemsRead = fread(buf, elementsize, count, fromfile);
+	if (ElemsRead <= 0)
 	{
 		// Empty file, elementsize or count is 0, or there was an error.
 		fclose(tofile);
@@ -868,8 +925,8 @@ inline int fcopyload(char* szFromFilePath, char* szToFilePath, unsigned char* bu
 		return EXIT_FAILURE;
 	}
 
-	*pBytesCopied = fwrite(buf, elementsize, BytesRead, tofile);
-	if (*pBytesCopied != BytesRead)
+	ElemsCopied = fwrite(buf, elementsize, ElemsRead, tofile);
+	if (ElemsCopied != ElemsRead)
 	{
 		fclose(tofile);
 		fclose(fromfile);
@@ -887,6 +944,8 @@ inline int fcopyload(char* szFromFilePath, char* szToFilePath, unsigned char* bu
 		return EXIT_FAILURE;
 	}
 
+	if (pBytesCopied) *pBytesCopied = elementsize*ElemsCopied;
+
 	return EXIT_SUCCESS;
 }
 
@@ -895,7 +954,7 @@ inline int fcopy(char* szFromFilePath, char* szToFilePath, size_t* pBytesCopied)
 	FILE* fromfile = NULL;
 	FILE* tofile = NULL;
 	unsigned char buf[1024];
-	size_t BytesRead = 0, BytesWritten = 0;
+	size_t BytesRead = 0, BytesWritten = 0, BytesCopied = 0;
 
 	fromfile = fopen(szFromFilePath, "rb");
 	if (fromfile == NULL)
@@ -910,10 +969,9 @@ inline int fcopy(char* szFromFilePath, char* szToFilePath, size_t* pBytesCopied)
 		return EXIT_FAILURE;
 	}
 
-	*pBytesCopied = 0;
 	do
 	{
-		BytesRead = fread(buf, sizeof(buf), 1, fromfile);
+		BytesRead = fread(buf, 1, sizeof(buf), fromfile);
 		if (BytesRead <= 0)
 		{
 			// Empty file, elementsize or count is 0, or there was an error.
@@ -922,7 +980,7 @@ inline int fcopy(char* szFromFilePath, char* szToFilePath, size_t* pBytesCopied)
 			return EXIT_FAILURE;
 		}
 
-		BytesWritten = fwrite(buf, BytesRead, 1, tofile);
+		BytesWritten = fwrite(buf, 1, BytesRead, tofile);
 		if (BytesWritten != BytesRead)
 		{
 			fclose(tofile);
@@ -930,7 +988,7 @@ inline int fcopy(char* szFromFilePath, char* szToFilePath, size_t* pBytesCopied)
 			return EXIT_FAILURE;
 		}
 
-		*pBytesCopied += BytesWritten;
+		BytesCopied += BytesWritten;
 	}
 	while (feof(fromfile) == 0);
 
@@ -945,7 +1003,28 @@ inline int fcopy(char* szFromFilePath, char* szToFilePath, size_t* pBytesCopied)
 		return EXIT_FAILURE;
 	}
 
+	if (pBytesCopied) *pBytesCopied = BytesCopied;
+
 	return EXIT_SUCCESS;
+}
+
+// See also comm_wait_change_val().
+inline int fwaitchg(char* filename, int msperiod, int maxcontentlen, char* prevcontent, int prevcontentlen, char* newcontent, int* pnewcontentlen)
+{
+	int ret = EXIT_FAILURE;
+	char* contenttmp = NULL;
+	if (maxcontentlen < prevcontentlen) return EXIT_INVALID_PARAMETER;
+	contenttmp = (char*)calloc(maxcontentlen, 1);
+	if (!contenttmp) return EXIT_OUT_OF_MEMORY;
+	for (;;)
+	{
+		int contenttmplen = 0;
+		if (fload(filename, (unsigned char*)contenttmp, 1, maxcontentlen, (size_t*)&contenttmplen) == EXIT_SUCCESS) { if ((contenttmplen != prevcontentlen)||(memcmp(contenttmp, prevcontent, prevcontentlen) != 0)) { *pnewcontentlen = contenttmplen; memcpy(newcontent, contenttmp, contenttmplen); ret = EXIT_SUCCESS; break; } }
+		else break;
+		mSleep(msperiod);
+	}
+	free(contenttmp); contenttmp = NULL;
+	return ret;
 }
 
 inline void RemoveExtensionInFilePath(char* szFilePath)
